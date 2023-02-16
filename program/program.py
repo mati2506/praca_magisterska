@@ -1,23 +1,27 @@
-import numpy as np
+ï»¿import numpy as np
+import pandas as pd
 import time
 import matplotlib.pyplot as plt
+import copy
 from matplotlib.colors import ListedColormap
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, roc_auc_score, f1_score
+from sklearn.metrics import confusion_matrix
 
-class MLP_class:
-    def __init__(self, hidden=(10,10,10), epochs=250, eta=0.1, shuffle=True, part=None, calc_s=False):
-        self.hidden = [hidden] if type(hidden)==int else hidden    #Liczba neuronów na kolejnych warstwach ukrytych
-        self.layers_count = 2 if type(hidden)==int else len(hidden)+1 #Liczba pow³ok ukrytych
+class MLP_cls:
+    def __init__(self, hidden=(10,10,10), epochs=250, eta=0.1, shuffle=True, part=None, calc_s=True):
+        self.hidden = [hidden] if type(hidden)==int else hidden    #Liczba neuronÃ³w na kolejnych warstwach ukrytych
+        self.layers_count = 2 if type(hidden)==int else len(hidden)+1 #Liczba warstw (ukrytych + wyjÅ›ciowa)
         self.epochs = epochs    #Liczba epok
-        self.eta = eta          #Wspó³czynnik uczenia
-        self.shuffle = shuffle  #Czy mieszaæ próbki w epokach
-        self.part = part        #na jakiej czesci probek uczyæ
+        self.eta = eta          #WspÃ³Å‚czynnik uczenia
+        self.shuffle = shuffle  #Czy mieszaÄ‡ prÃ³bki w epokach
+        self.part = part        #na jakiej czesci probek uczyÄ‡
         self.coefs_ = None      #wagi
         self.intercepts_ = None #biasy
         self.class_labels_ = None #nazwy klas
+        self.class_type = None    #jakiego typu jest zmienna decyzyjna
         self.class_count = None   #liczba klas
-        self.calc_s = calc_s      #czy obliczaæ parametr potrzebny w przycinaniu Karnina
+        self.calc_s = calc_s      #czy obliczaÄ‡ parametr potrzebny w przycinaniu Karnina
+        self.karnin_s = None      #parametr do metody Karnina
         
     def _sigmoid(self, x):
         return 1/(1+np.exp(-x))
@@ -31,14 +35,19 @@ class MLP_class:
             activation[i] = tmp
         return activation
     
-    def fit(self, X, Y):
+    def fit(self, X, Y, X_val=None, Y_val=None):
         samples, features = X.shape
         if self.class_labels_ is None:
             self.class_labels_ = np.unique(Y)
+            self.class_type = type(self.class_labels_[0])
             self.class_count = len(self.class_labels_)
         y = np.zeros((samples, self.class_count))
         for i in range(samples):
             y[i,np.where(self.class_labels_==Y[i])[0]] = 1
+
+        if X_val is None and Y_val is None:
+            X_val = X.copy()
+            Y_val = Y.copy()
             
         self.coefs_ = [None]*self.layers_count
         self.intercepts_ = [None]*self.layers_count
@@ -49,8 +58,18 @@ class MLP_class:
             self.intercepts_[i] = np.random.normal(size=self.hidden[i])
         self.coefs_[-1] = np.random.normal(size=(self.hidden[-1],self.class_count))
         self.intercepts_[-1] = np.random.normal(size=self.class_count)
+
+        if self.calc_s:
+            init_coefs = copy.deepcopy(self.coefs_)
+
+            self.karnin_s = [None]*self.layers_count
+            for i in range(self.layers_count):
+                self.karnin_s[i] = np.zeros(self.coefs_[i].shape)
         
         for epoch in range(self.epochs):
+            if self.calc_s:
+                last_coefs = copy.deepcopy(self.coefs_)
+
             ind = np.arange(samples)
             if self.shuffle:
                 np.random.shuffle(ind)
@@ -72,12 +91,19 @@ class MLP_class:
                 gradient = np.outer(X[i], delta)
                 self.intercepts_[0] -= self.eta*delta
                 self.coefs_[0] -= self.eta*gradient
-            if np.sum(self.predict(X)==Y) == samples:
-                print(f"Uczenie zakoñczone po {epoch+1} epokach. Osi¹gniêto dopasowanie.")
+
+            if self.calc_s:
+                for i in range(self.layers_count):
+                    coef = self.coefs_[i]
+                    if np.all(coef != init_coefs[i]):
+                        self.karnin_s[i] += ((coef-last_coefs[i])**2)*(coef/(self.eta*(coef-init_coefs[i])))
+
+            if np.sum(self.predict(X_val)==Y_val) == samples:
+                print(f"Uczenie zakoÅ„czone po {epoch+1} epokach. OsiÄ…gniÄ™to dopasowanie.")
                 break
     
     def predict(self, X):
-        Y = np.zeros(X.shape[0])
+        Y = np.zeros(X.shape[0], dtype=self.class_type)
         for i, w in enumerate(self._forward(X)[-1]):
             Y[i] = self.class_labels_[np.argmax(w)]
         return Y
@@ -88,5 +114,25 @@ class MLP_class:
     def get_number_of_parametrs(self):
         res = 0
         for i in range(self.layers_count):
-            res += (self.intercepts_[i].shape[0] + self.coefs_[i].shape[0]*self.coefs_[i].shape[1])
+            w, h = self.coefs_[i].shape
+            res += (self.intercepts_[i].shape[0] + w*h)
         return res
+
+    def get_nuber_of_coefs(self):
+        num = 0
+        for coef in self.coefs_:
+            w, h = coef.shape
+            num += w*h
+        return num
+
+
+
+
+#test dziaÅ‚ania
+data = pd.read_csv("iris.data")
+X = data.iloc[:,1:4].values
+Y = data.iloc[:,4].values
+X_train, X_test, y_train, y_test = train_test_split(X, Y)
+clf = MLP_cls(epochs=50)
+clf.fit(X_train, y_train)
+print(clf.karnin_s)
