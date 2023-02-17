@@ -245,26 +245,13 @@ class MLP_reg:
 
 
 #test działania
-#data = pd.read_csv("iris.data")
-#X = data.iloc[:,1:4].values
-#Y = data.iloc[:,4].values
-#X_train, X_test, y_train, y_test = train_test_split(X, Y)
-#clf = MLP_clf(epochs=100)
-#clf.fit(X_train, y_train)
-#print(clf.coefs_)
+data = pd.read_csv("iris.data")
+X = data.iloc[:,1:4].values
+Y = data.iloc[:,4].values
+X_train, X_test, y_train, y_test = train_test_split(X, Y)
+clf = MLP_clf(epochs=100)
+clf.fit(X_train, y_train)
+print(clf.coefs_)
 
-#print(clf.predict(X_test))
-#print(y_test)
-
-n = 250
-a = 2
-b = 1
-c = 3
-
-x = np.sort(np.random.uniform(-2,2,n)).reshape(-1,1)
-
-ya_s1 = a*x + b
-
-reg = MLP_reg(epochs=100)
-reg.fit(x, ya_s1)
-print(reg.coefs_)
+print(clf.predict(X_test))
+print(y_test)
