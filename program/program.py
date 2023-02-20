@@ -290,8 +290,7 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True)
         if del_neuron:
             for i in range(1,l_c): #sprawdzenie, czy usunąć neuron, gdy jego wszystkie wyjścia zostały przycięte; wagi między atrybirami, a pierwsza warstwą ukrytą są pomijane
                 sums = np.nansum(tmp_w[i], axis=1)
-                wh = np.where(sums==0)[0]
-                for ind in wh: #for wykonywany jednokrotnie
+                for ind in np.where(sums==0)[0]: #for wykonywany jednokrotnie
                     tmp_w[i] = np.delete(tmp_w[i], ind, 0)
                     tmp_w[i-1] = np.delete(tmp_w[i-1], ind, 1)
                     tmp_b[i-1] = np.delete(tmp_b[i-1], ind, 0) #usunięcie bisu odpowiadającego usuwanemu neuronowi, może gdzieś tą wartośc by dodawać???
