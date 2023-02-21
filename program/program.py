@@ -382,7 +382,7 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
                 tmp_val[i] = tmp_w[i][tmp_ind[i]]
         tmp = np.nanargmin(np.abs(np.array(tmp_val)))
         tmp_w[tmp][tmp_ind[tmp]] = np.nan
-        clf_reg.intercepts_[tmp][tmp_ind[tmp][1]] += np.mean(clf_reg.outs_of_single_neuron(X_t, tmp, tmp_ind[tmp]))
+        clf_reg.intercepts_[tmp][tmp_ind[tmp][1]] += np.mean(clf_reg.outs_of_single_neuron(X_t, tmp, tmp_ind[tmp])) #przemyśleć ten krok, bo uzywam wag i bisów już przyciętych, może to mieć wpływ na wyniki...
         clf_reg.coefs_[tmp][tmp_ind[tmp]] = 0
         
         if del_neuron:
