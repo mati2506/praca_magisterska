@@ -131,6 +131,17 @@ class MLP_clf:
             num += w*h
         return num
 
+    def outs_of_single_neuron(self, X, number, index):
+        w = X.shape[0]
+        outs = np.zeros(w)
+        for j in range(w):
+            activation_i = X[j].copy()
+            for i in range(number):
+                sum_out = np.dot(activation_i, self.coefs_[i]) + self.intercepts_[i]
+                activation_i = self._sigmoid(sum_out)
+            outs[j] = activation_i[index[0]]*self.coefs_[number][index]
+        return outs
+
 
 
 class MLP_reg:
@@ -199,7 +210,7 @@ class MLP_reg:
             if self.part is not None:
                 ind = ind[:int(samples*self.part)]
             
-            for i in ind:
+            for i in ind: #poprawić krok wstecz
                 activation = self._forward(X[i])
                 delta = (activation[-1] - Y[i])*(activation[-1]*(1 - activation[-1]))
                 gradient = np.outer(activation[-2], delta)
@@ -242,6 +253,17 @@ class MLP_reg:
             num += w*h
         return num
 
+    def outs_of_single_neuron(self, X, number, index):
+        w = X.shape[0]
+        outs = np.zeros(w)
+        for j in range(w):
+            activation_i = X[j].copy()
+            for i in range(number):
+                sum_out = np.dot(activation_i, self.coefs_[i]) + self.intercepts_[i]
+                activation_i = self._sigmoid(sum_out)
+            outs[j] = activation_i[index[0]]*self.coefs_[number][index]
+        return outs
+
 
 
 def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True): #lost - maksymalna procentowa utrata dokładności podczas przycinania
@@ -264,7 +286,6 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True)
     del_w = 0 #liczba usuniętych wag
 
     tmp_w = copy.deepcopy(clf_reg.coefs_)
-    tmp_b = copy.deepcopy(clf_reg.intercepts_)
 
     for i in range(l_c):
         tmp_w[i][tmp_w[i] == 0] = np.nan
@@ -289,14 +310,16 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True)
         
         if del_neuron:
             for i in range(1,l_c): #sprawdzenie, czy usunąć neuron, gdy jego wszystkie wyjścia zostały przycięte; wagi między atrybirami, a pierwsza warstwą ukrytą są pomijane
-                sums = np.nansum(tmp_w[i], axis=1)
-                for ind in np.where(sums==0)[0]: #for wykonywany jednokrotnie
-                    tmp_w[i] = np.delete(tmp_w[i], ind, 0)
-                    tmp_w[i-1] = np.delete(tmp_w[i-1], ind, 1)
-                    tmp_b[i-1] = np.delete(tmp_b[i-1], ind, 0) #usunięcie bisu odpowiadającego usuwanemu neuronowi, może gdzieś tą wartośc by dodawać???
-                    clf_reg.coefs_[i] = np.delete(clf_reg.coefs_[i], ind, 0)
-                    clf_reg.coefs_[i-1] = np.delete(clf_reg.coefs_[i-1], ind, 1)
-                    clf_reg.intercepts_[i-1] = np.delete(clf_reg.intercepts_[i-1], ind, 0) #usunięcie bisu odpowiadającego usuwanemu neuronowi, może gdzieś tą wartośc by dodawać???
+                if tmp_w[i].shape[0] > 1: #czy w warstwie są przynajmniej 2 neurony
+                    sums = np.nansum(tmp_w[i], axis=1)
+                    for ind in np.where(sums==0)[0]: #for wykonywany jednokrotnie
+                        tmp_w[i] = np.delete(tmp_w[i], ind, 0)
+                        tmp_w[i-1] = np.delete(tmp_w[i-1], ind, 1)
+                        del_w += np.sum(clf_reg.coefs_[i-1][:,ind] != 0) #usunięte wagi z kolumny warstwy poprzedzającej (potrzebne do zakończenia głównego while)
+                        clf_reg.coefs_[i] = np.delete(clf_reg.coefs_[i], ind, 0)
+                        clf_reg.coefs_[i-1] = np.delete(clf_reg.coefs_[i-1], ind, 1)
+                        clf_reg.intercepts_[i-1] = np.delete(clf_reg.intercepts_[i-1], ind, 0) #usunięcie bisu odpowiadającego usuwanemu neuronowi, może gdzieś tą wartośc by dodawać???
+                        break
 
         if if_clf:
             acc = accuracy_score(y_v, clf_reg.predict(X_v))
@@ -315,19 +338,85 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True)
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         del_w += 1
-        #clf_reg.refit(X_t, y_t, X_v, y_v) #NAPISAĆ METODĘ DOSTARAJAJĄCĄ PO PRZYCINANIU!!!
+    #clf_reg.refit(X_t, y_t, X_v, y_v) #NAPISAĆ METODĘ DOSTARAJAJĄCĄ PO PRZYCINANIU!!!
     return del_w
 
-def _outs_of_single_neuron(clf_reg, X, weight, bias, number, index):
-    w = X.shape[0]
-    outs = np.zeros(w)
-    for j in range(w):
-        activation_i = X[j].copy()
-        for i in range(number):
-            sum_out = np.dot(activation_i, weight[i]) + bias[i]
-            activation_i = clf_reg._sigmoid(sum_out)
-            outs[i] = activation_i[index[0]]*weight[number][index]
-    return outs
+
+def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True): #lost - maksymalna procentowa utrata dokładności podczas przycinania
+    if clf_reg.coefs_[-1].shape[1] == 1:
+        if_clf = False
+    else:
+        if_clf = True
+
+    if X_v is None or y_v is None:
+        X_v = X_t.copy()
+        y_v = y_t.copy()
+
+    if if_clf:
+        in_acc = accuracy_score(y_v, clf_reg.predict(X_v))
+    else:
+        in_error = mean_squared_error(y_v, clf_reg.predict(X_v))
+
+    l_c = clf_reg.layers_count
+    num_of_coefs = clf_reg.get_nuber_of_coefs()
+    del_w = 0 #liczba usuniętych wag
+
+    tmp_w = copy.deepcopy(clf_reg.coefs_)
+
+    for i in range(l_c):
+        tmp_w[i][tmp_w[i] == 0] = np.nan
+        del_w += np.sum(tmp_w[i] == 0)
+
+    tmp_ind = [None]*l_c
+    tmp_val = [None]*l_c
+    while del_w < num_of_coefs:      
+        last_w = copy.deepcopy(clf_reg.coefs_)
+        last_b = copy.deepcopy(clf_reg.intercepts_)
+        
+        for i in range(l_c):
+            if np.sum(np.isnan(tmp_w[i])) == np.size(tmp_w[i]):
+                tmp_ind[i] = (0,0)
+                tmp_val[i] = np.nan
+            else:
+                tmp_ind[i] = np.unravel_index(np.nanargmin(np.abs(tmp_w[i])),shape=tmp_w[i].shape)
+                tmp_val[i] = tmp_w[i][tmp_ind[i]]
+        tmp = np.nanargmin(np.abs(np.array(tmp_val)))
+        tmp_w[tmp][tmp_ind[tmp]] = np.nan
+        clf_reg.intercepts_[tmp][tmp_ind[tmp][1]] += np.mean(clf_reg.outs_of_single_neuron(X_t, tmp, tmp_ind[tmp]))
+        clf_reg.coefs_[tmp][tmp_ind[tmp]] = 0
+        
+        if del_neuron:
+            for i in range(1,l_c): #sprawdzenie, czy usunąć neuron, gdy jego wszystkie wyjścia zostały przycięte; wagi między atrybirami, a pierwsza warstwą ukrytą są pomijane
+                if tmp_w[i].shape[0] > 1: #czy w warstwie są przynajmniej 2 neurony
+                    sums = np.nansum(tmp_w[i], axis=1)
+                    for ind in np.where(sums==0)[0]: #for wykonywany jednokrotnie
+                        tmp_w[i] = np.delete(tmp_w[i], ind, 0)
+                        tmp_w[i-1] = np.delete(tmp_w[i-1], ind, 1)
+                        del_w += np.sum(clf_reg.coefs_[i-1][:,ind] != 0) #usunięte wagi z kolumny warstwy poprzedzającej (potrzebne do zakończenia głównego while)
+                        clf_reg.coefs_[i] = np.delete(clf_reg.coefs_[i], ind, 0)
+                        clf_reg.coefs_[i-1] = np.delete(clf_reg.coefs_[i-1], ind, 1)
+                        clf_reg.intercepts_[i-1] = np.delete(clf_reg.intercepts_[i-1], ind, 0) #usunięcie bisu odpowiadającego usuwanemu neuronowi, może gdzieś tą wartośc by dodawać???
+                        break
+
+        if if_clf:
+            acc = accuracy_score(y_v, clf_reg.predict(X_v))
+            if acc > in_acc: #dokładność wzrosła, od teraz maksymalna utrata dokłądności liczona względem wyższej dokładności
+                in_acc = acc
+            elif acc < in_acc*(1-lost):
+                clf_reg.coefs_ = copy.deepcopy(last_w)
+                clf_reg.intercepts_ = copy.deepcopy(last_b)
+                break
+        else:
+            error = mean_squared_error(y_v, clf_reg.predict(X_v))
+            if error < in_error: #błąd zmalał, od teraz maksymalny wzrost błędu liczony względem mniejszego błędu
+                in_error = error
+            elif error > in_error*(1+lost):
+                clf_reg.coefs_ = copy.deepcopy(last_w)
+                clf_reg.intercepts_ = copy.deepcopy(last_b)
+                break
+        del_w += 1
+    #clf_reg.refit(X_t, y_t, X_v, y_v) #NAPISAĆ METODĘ DOSTARAJAJĄCĄ PO PRZYCINANIU!!!
+    return del_w
 
    
 
@@ -340,9 +429,17 @@ clf = MLP_clf(epochs=100)
 clf.fit(X_train, y_train)
 print(clf.coefs_)
 
-a = simple_pruning(clf, 0.5, X_train, y_train)
+clf1 = copy.deepcopy(clf)
+a = simple_pruning(clf1, 0.6, X_train, y_train)
 print(a)
-print(clf.coefs_)
+print(clf1.coefs_)
 
-print(clf.predict(X_test))
-print(y_test)
+print(accuracy_score(y_test, clf1.predict(X_test)))
+
+
+clf2 = copy.deepcopy(clf)
+b = simple_pruning_amendment(clf2, 0.6, X_train, y_train)
+print(b)
+print(clf2.coefs_)
+
+print(accuracy_score(y_test, clf2.predict(X_test)))
