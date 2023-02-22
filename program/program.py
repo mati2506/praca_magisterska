@@ -384,7 +384,7 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
         tmp = np.nanargmin(np.abs(np.array(tmp_val)))
         tmp_w[tmp][tmp_ind[tmp]] = np.nan
         ind_w = list(tmp_ind[tmp])
-        ind_w = (ind_w[0]+len(np.where(del_n[tmp] < ind_w[0])[0]), ind_w[1]+len(np.where(del_n[tmp+1] < ind_w[1])[0]))
+        ind_w = (ind_w[0]+np.sum(del_n[tmp] <= ind_w[0]), ind_w[1]+np.sum(del_n[tmp+1] <= ind_w[1]))
         clf_reg.intercepts_[tmp][tmp_ind[tmp][1]] += np.mean(c_r_clc.outs_of_single_neuron(X_t, tmp, ind_w))
         clf_reg.coefs_[tmp][tmp_ind[tmp]] = 0
         
@@ -393,6 +393,7 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
                 if tmp_w[i].shape[0] > 1: #czy w warstwie są przynajmniej 2 neurony
                     sums = np.nansum(tmp_w[i], axis=1)
                     for ind in np.where(sums==0)[0]:
+                        del_n[i][del_n[i] > ind] -= 1 #przesunięcie, aby uniknąć pominięcia usuniętego wiersza, gdy najpierw usuwany jest wiersz o wyższym indeksie, a później o niższym
                         del_n[i] = np.append(del_n[i], [ind])
                         tmp_w[i] = np.delete(tmp_w[i], ind, 0)
                         tmp_w[i-1] = np.delete(tmp_w[i-1], ind, 1)
@@ -461,7 +462,7 @@ def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True)
         tmp = np.nanargmin(np.abs(np.array(tmp_val)))
         s[tmp][tmp_ind[tmp]] = np.nan
         ind_w = list(tmp_ind[tmp])
-        ind_w = (ind_w[0]+len(np.where(del_n[tmp] < ind_w[0])[0]), ind_w[1]+len(np.where(del_n[tmp+1] < ind_w[1])[0]))
+        ind_w = (ind_w[0]+np.sum(del_n[tmp] <= ind_w[0]), ind_w[1]+np.sum(del_n[tmp+1] <= ind_w[1]))
         clf_reg.intercepts_[tmp][tmp_ind[tmp][1]] += np.mean(c_r_clc.outs_of_single_neuron(X_t, tmp, ind_w))
         clf_reg.coefs_[tmp][tmp_ind[tmp]] = 0
         
@@ -470,6 +471,7 @@ def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True)
                 if s[i].shape[0] > 1: #czy w warstwie są przynajmniej 2 neurony
                     sums = np.nansum(s[i], axis=1)
                     for ind in np.where(sums==0)[0]:
+                        del_n[i][del_n[i] > ind] -= 1 #przesunięcie, aby uniknąć pominięcia usuniętego wiersza, gdy najpierw usuwany jest wiersz o wyższym indeksie, a później o niższym
                         del_n[i] = np.append(del_n[i], [ind])
                         s[i] = np.delete(s[i], ind, 0)
                         s[i-1] = np.delete(s[i-1], ind, 1)
@@ -511,7 +513,7 @@ clf.fit(X_train, y_train)
 #print(clf.coefs_)
 
 clf1 = copy.deepcopy(clf)
-a, d1 = simple_pruning(clf1, 0.2, X_train, y_train)
+a, d1 = simple_pruning(clf1, 0.05, X_train, y_train)
 print(a)
 print(d1)
 #print(clf1.coefs_)
@@ -521,7 +523,7 @@ print()
 
 
 clf2 = copy.deepcopy(clf)
-b, d2 = simple_pruning_amendment(clf2, 0.2, X_train, y_train)
+b, d2 = simple_pruning_amendment(clf2, 0.05, X_train, y_train)
 print(b)
 print(d2)
 #print(clf2.coefs_)
@@ -531,7 +533,7 @@ print()
 
 
 clf3 = copy.deepcopy(clf)
-c, d3 = karnin_pruning(clf3, 0.2, X_train, y_train)
+c, d3 = karnin_pruning(clf3, 0.05, X_train, y_train)
 print(c)
 print(d3)
 #print(clf3.coefs_)
