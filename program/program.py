@@ -8,11 +8,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, mean_squared_error, accuracy_score
 
 class MLP_clf:
-    def __init__(self, hidden=(10,10,10), epochs=250, eta=0.1, shuffle=True, part=None, calc_s=True):
+    def __init__(self, hidden=(10,10,10), epochs=250, eta=0.1, activation = "relu", shuffle=True, part=None, calc_s=True):
         self.hidden = [hidden] if type(hidden)==int else list(hidden)    #Liczba neuronów na kolejnych warstwach ukrytych
         self.layers_count = 2 if type(hidden)==int else len(hidden)+1 #Liczba warstw (ukrytych + wyjściowa)
         self.epochs = epochs    #Liczba epok
         self.eta = eta          #Współczynnik uczenia
+        self.activ = activation #Funkcja aktywacji używana w warstwach ukrytych
         self.shuffle = shuffle  #Czy mieszać próbki w epokach
         self.part = part        #na jakiej czesci probek uczyć
         self.coefs_ = None      #wagi
@@ -30,15 +31,20 @@ class MLP_clf:
         return np.max([np.zeros(x.shape), x], axis=0)
 
     def _softmax(self, x):
-        return x/np.sum(x)
+        ex = np.exp(x)
+        return ex/np.sum(ex)
     
     def _forward(self, X):
         activation = [None]*self.layers_count
         tmp = X.copy()
-        for i in range(self.layers_count):
+        for i in range(self.layers_count-1):
             sum_out = np.dot(tmp, self.coefs_[i]) + self.intercepts_[i]
-            tmp = self._sigmoid(sum_out)
-            activation[i] = tmp
+            if self.activ == "sigmoid":
+                tmp = self._sigmoid(sum_out)
+            else:
+                tmp = self._relu(sum_out)
+            activation[i] = tmp.copy()
+        activation[-1] = self._sigmoid(np.dot(tmp, self.coefs_[-1]) + self.intercepts_[-1]) #docelowo softmax, ale pochodna jest jakaś dziwna
         return activation
     
     def fit(self, X, Y, X_val=None, Y_val=None):
@@ -84,17 +90,23 @@ class MLP_clf:
             
             for i in ind:
                 activation = self._forward(X[i])
-                deri = (activation[-1]*(1 - activation[-1]))
+                deri = activation[-1]*(1 - activation[-1]) #docelowo pochodna softmax
                 delta = (activation[-1] - y[i])*deri
                 gradient = np.outer(activation[-2], delta)
                 self.intercepts_[-1] -= self.eta*delta
                 for j in range(self.layers_count-2,0,-1):
-                    deri = (activation[j]*(1 - activation[j]))
+                    if self.activ == "sigmoid":
+                        deri = activation[j]*(1 - activation[j])
+                    else:
+                        deri = (activation[j]>0)*1
                     delta = np.dot(delta, self.coefs_[j+1].T)*deri
                     self.coefs_[j+1] -= self.eta*gradient
                     gradient = np.outer(activation[j-1], delta)
                     self.intercepts_[j] -= self.eta*delta
-                deri = (activation[0]*(1 - activation[0]))
+                if self.activ == "sigmoid":
+                    deri = activation[0]*(1 - activation[0])
+                else:
+                    deri = (activation[0]>0)*1
                 delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
@@ -148,11 +160,12 @@ class MLP_clf:
 
 
 class MLP_reg:
-    def __init__(self, hidden=(10,10,10), epochs=250, eta=0.1, shuffle=True, part=None, calc_s=True):
+    def __init__(self, hidden=(10,10,10), epochs=250, eta=0.1, activation = "relu", shuffle=True, part=None, calc_s=True):
         self.hidden = [hidden] if type(hidden)==int else list(hidden)    #Liczba neuronów na kolejnych warstwach ukrytych
         self.layers_count = 2 if type(hidden)==int else len(hidden)+1 #Liczba warstw (ukrytych + wyjściowa)
         self.epochs = epochs    #Liczba epok
         self.eta = eta          #Współczynnik uczenia
+        self.activ = activation #Funkcja aktywacji używana w warstwach ukrytych
         self.shuffle = shuffle  #Czy mieszać próbki w epokach
         self.part = part        #na jakiej czesci probek uczyć
         self.coefs_ = None      #wagi
@@ -174,8 +187,11 @@ class MLP_reg:
         tmp = X.copy()
         for i in range(self.layers_count-1):
             sum_out = np.dot(tmp, self.coefs_[i]) + self.intercepts_[i]
-            tmp = self._sigmoid(sum_out)
-            activation[i] = tmp
+            if self.activ == "sigmoid":
+                tmp = self._sigmoid(sum_out)
+            else:
+                tmp = self._relu(sum_out)
+            activation[i] = tmp.copy()
         activation[-1] = self._identity(np.dot(tmp, self.coefs_[-1]) + self.intercepts_[-1])
         return activation
     
@@ -220,12 +236,18 @@ class MLP_reg:
                 gradient = np.outer(activation[-2], delta)
                 self.intercepts_[-1] -= self.eta*delta
                 for j in range(self.layers_count-2,0,-1):
-                    deri = (activation[j]*(1 - activation[j]))
+                    if self.activ == "sigmoid":
+                        deri = activation[j]*(1 - activation[j])
+                    else:
+                        deri = (activation[j]>0)*1
                     delta = np.dot(delta, self.coefs_[j+1].T)*deri
                     self.coefs_[j+1] -= self.eta*gradient
                     gradient = np.outer(activation[j-1], delta)
                     self.intercepts_[j] -= self.eta*delta
-                deri = (activation[0]*(1 - activation[0]))
+                if self.activ == "sigmoid":
+                    deri = activation[0]*(1 - activation[0])
+                else:
+                    deri = (activation[0]>0)*1
                 delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
@@ -620,7 +642,7 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
 #X = data.iloc[:,1:4].values
 #Y = data.iloc[:,4].values
 #X_train, X_test, y_train, y_test = train_test_split(X, Y)
-#clf = MLP_clf(epochs=100)
+#clf = MLP_clf(epochs=100, activation="sigmoid")
 #clf.fit(X_train, y_train)
 ##print(clf.coefs_)
 
@@ -672,13 +694,13 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
 x = np.sort(np.random.uniform(-2,2,20)).reshape(-1,1)
 y = 2*x + 1
 
-reg = MLP_reg()
+reg = MLP_reg(activation="sigmoid")
 reg.fit(x,y)
-
+print(reg.coefs_)
 print(mean_squared_error(y, reg.predict(x)))
 
-a, d1 = simple_pruning(reg, 0.1, x, y)
-print(a)
-print(d1)
+#a, d1 = simple_pruning(reg, 0.1, x, y)
+#print(a)
+#print(d1)
 
-print(mean_squared_error(y, reg.predict(x)))
+#print(mean_squared_error(y, reg.predict(x)))
