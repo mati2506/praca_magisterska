@@ -84,15 +84,18 @@ class MLP_clf:
             
             for i in ind:
                 activation = self._forward(X[i])
-                delta = (activation[-1] - y[i])*(activation[-1]*(1 - activation[-1]))
+                deri = (activation[-1]*(1 - activation[-1]))
+                delta = (activation[-1] - y[i])*deri
                 gradient = np.outer(activation[-2], delta)
                 self.intercepts_[-1] -= self.eta*delta
                 for j in range(self.layers_count-2,0,-1):
-                    delta = np.dot(delta, self.coefs_[j+1].T)*(activation[j]*(1 - activation[j]))
+                    deri = (activation[j]*(1 - activation[j]))
+                    delta = np.dot(delta, self.coefs_[j+1].T)*deri
                     self.coefs_[j+1] -= self.eta*gradient
                     gradient = np.outer(activation[j-1], delta)
                     self.intercepts_[j] -= self.eta*delta
-                delta = np.dot(delta, self.coefs_[1].T)*(activation[0]*(1 - activation[0]))
+                deri = (activation[0]*(1 - activation[0]))
+                delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
                 self.intercepts_[0] -= self.eta*delta
@@ -210,17 +213,20 @@ class MLP_reg:
             if self.part is not None:
                 ind = ind[:int(samples*self.part)]
             
-            for i in ind: #poprawić krok wstecz
+            for i in ind:
                 activation = self._forward(X[i])
-                delta = (activation[-1] - Y[i])*(activation[-1]*(1 - activation[-1]))
+                deri = 1 #pochodna x to 1 (funkcja aktywacji jest funkcją liniową)
+                delta = (activation[-1] - Y[i])*deri
                 gradient = np.outer(activation[-2], delta)
                 self.intercepts_[-1] -= self.eta*delta
                 for j in range(self.layers_count-2,0,-1):
-                    delta = np.dot(delta, self.coefs_[j+1].T)*(activation[j]*(1 - activation[j]))
+                    deri = (activation[j]*(1 - activation[j]))
+                    delta = np.dot(delta, self.coefs_[j+1].T)*deri
                     self.coefs_[j+1] -= self.eta*gradient
                     gradient = np.outer(activation[j-1], delta)
                     self.intercepts_[j] -= self.eta*delta
-                delta = np.dot(delta, self.coefs_[1].T)*(activation[0]*(1 - activation[0]))
+                deri = (activation[0]*(1 - activation[0]))
+                delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
                 self.intercepts_[0] -= self.eta*delta
@@ -339,8 +345,12 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True)
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         del_w += 1
+    if if_clf:
+        miar = acc
+    else:
+        miar = error
     #clf_reg.refit(X_t, y_t, X_v, y_v) #NAPISAĆ METODĘ DOSTARAJAJĄCĄ PO PRZYCINANIU!!!
-    return del_w, acc
+    return del_w, miar
 
 def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True): #lost - maksymalna procentowa utrata dokładności podczas przycinania
     if clf_reg.coefs_[-1].shape[1] == 1:
@@ -422,8 +432,12 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         del_w += 1
+    if if_clf:
+        miar = acc
+    else:
+        miar = error
     #clf_reg.refit(X_t, y_t, X_v, y_v) #NAPISAĆ METODĘ DOSTARAJAJĄCĄ PO PRZYCINANIU!!!
-    return del_w, acc
+    return del_w, miar
 
 def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True): #lost - maksymalna procentowa utrata dokładności podczas przycinania
     if clf_reg.coefs_[-1].shape[1] == 1:
@@ -501,8 +515,12 @@ def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True)
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         del_w += 1
+    if if_clf:
+        miar = acc
+    else:
+        miar = error
     #clf_reg.refit(X_t, y_t, X_v, y_v) #NAPISAĆ METODĘ DOSTARAJAJĄCĄ PO PRZYCINANIU!!!
-    return del_w, acc
+    return del_w, miar
 
 def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True): #lost - maksymalna procentowa utrata dokładności podczas przycinania
     if clf_reg.coefs_[-1].shape[1] == 1:
@@ -588,61 +606,79 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         del_w += 1
+    if if_clf:
+        miar = acc
+    else:
+        miar = error
     #clf_reg.refit(X_t, y_t, X_v, y_v) #NAPISAĆ METODĘ DOSTARAJAJĄCĄ PO PRZYCINANIU!!!
-    return del_w, acc
+    return del_w, miar
 
    
 
 #test działania
-data = pd.read_csv("iris.data")
-X = data.iloc[:,1:4].values
-Y = data.iloc[:,4].values
-X_train, X_test, y_train, y_test = train_test_split(X, Y)
-clf = MLP_clf(epochs=100)
-clf.fit(X_train, y_train)
-#print(clf.coefs_)
+#data = pd.read_csv("iris.data")
+#X = data.iloc[:,1:4].values
+#Y = data.iloc[:,4].values
+#X_train, X_test, y_train, y_test = train_test_split(X, Y)
+#clf = MLP_clf(epochs=100)
+#clf.fit(X_train, y_train)
+##print(clf.coefs_)
 
-ll = 0.05
+#ll = 0.05
 
-clf1 = copy.deepcopy(clf)
-a, d1 = simple_pruning(clf1, ll, X_train, y_train)
+#clf1 = copy.deepcopy(clf)
+#a, d1 = simple_pruning(clf1, ll, X_train, y_train)
+#print(a)
+#print(d1)
+##print(clf1.coefs_)
+
+#print(accuracy_score(y_train, clf1.predict(X_train)))
+#print(accuracy_score(y_test, clf1.predict(X_test)))
+#print()
+
+
+#clf2 = copy.deepcopy(clf)
+#b, d2 = simple_pruning_amendment(clf2, ll, X_train, y_train)
+#print(b)
+#print(d2)
+##print(clf2.coefs_)
+
+#print(accuracy_score(y_train, clf2.predict(X_train)))
+#print(accuracy_score(y_test, clf2.predict(X_test)))
+#print()
+
+
+#clf3 = copy.deepcopy(clf)
+#c, d3 = karnin_pruning(clf3, ll, X_train, y_train)
+#print(c)
+#print(d3)
+##print(clf3.coefs_)
+
+#print(accuracy_score(y_train, clf3.predict(X_train)))
+#print(accuracy_score(y_test, clf3.predict(X_test)))
+#print()
+
+
+#clf4 = copy.deepcopy(clf)
+#d, d4 = pruning_by_variance(clf4, ll, X_train, y_train)
+#print(d)
+#print(d4)
+##print(clf3.coefs_)
+
+#print(accuracy_score(y_train, clf4.predict(X_train)))
+#print(accuracy_score(y_test, clf4.predict(X_test)))
+#print()
+
+x = np.sort(np.random.uniform(-2,2,20)).reshape(-1,1)
+y = 2*x + 1
+
+reg = MLP_reg()
+reg.fit(x,y)
+
+print(mean_squared_error(y, reg.predict(x)))
+
+a, d1 = simple_pruning(reg, 0.1, x, y)
 print(a)
 print(d1)
-#print(clf1.coefs_)
 
-print(accuracy_score(y_train, clf1.predict(X_train)))
-print(accuracy_score(y_test, clf1.predict(X_test)))
-print()
-
-
-clf2 = copy.deepcopy(clf)
-b, d2 = simple_pruning_amendment(clf2, ll, X_train, y_train)
-print(b)
-print(d2)
-#print(clf2.coefs_)
-
-print(accuracy_score(y_train, clf2.predict(X_train)))
-print(accuracy_score(y_test, clf2.predict(X_test)))
-print()
-
-
-clf3 = copy.deepcopy(clf)
-c, d3 = karnin_pruning(clf3, ll, X_train, y_train)
-print(c)
-print(d3)
-#print(clf3.coefs_)
-
-print(accuracy_score(y_train, clf3.predict(X_train)))
-print(accuracy_score(y_test, clf3.predict(X_test)))
-print()
-
-
-clf4 = copy.deepcopy(clf)
-d, d4 = pruning_by_variance(clf4, ll, X_train, y_train)
-print(d)
-print(d4)
-#print(clf3.coefs_)
-
-print(accuracy_score(y_train, clf4.predict(X_train)))
-print(accuracy_score(y_test, clf4.predict(X_test)))
-print()
+print(mean_squared_error(y, reg.predict(x)))
