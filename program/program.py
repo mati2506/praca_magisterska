@@ -119,7 +119,7 @@ class MLP_clf:
                     if np.all(coef != init_coefs[i]):
                         self.karnin_s[i] += ((coef-last_coefs[i])**2)*(coef/(self.eta*(coef-init_coefs[i])))
 
-            if np.sum(self.predict(X_val)==Y_val) == samples:
+            if accuracy_score(Y_val, self.predict(X_val)) == 1:
                 print(f"Uczenie zakończone po {epoch+1} epokach. Osiągnięto dopasowanie.")
                 break
     
@@ -131,6 +131,54 @@ class MLP_clf:
     
     def predict_proba(self, X):
         return np.array([self._forward(x)[-1] for x in X])
+
+    def refit(self, X, Y, X_val, Y_val, ep):
+        samples = X.shape[0]
+        y = np.zeros((samples, self.class_count))
+        for i in range(samples):
+            y[i,np.where(self.class_labels_==Y[i])[0]] = 1
+
+        zero_w = [None]*self.layers_count
+        for i in range(self.layers_count):
+            zero_w[i] = (self.coefs_[i] == 0)
+
+        for _ in range(ep):
+            ind = np.arange(samples)
+            if self.shuffle:
+                np.random.shuffle(ind)
+            if self.part is not None:
+                ind = ind[:int(samples*self.part)]
+
+            for i in ind:
+                activation = self._forward(X[i])
+                deri = activation[-1]*(1 - activation[-1]) #docelowo pochodna softmax
+                delta = (activation[-1] - y[i])*deri
+                gradient = np.outer(activation[-2], delta)
+                gradient[zero_w[-1]] = 0 #zachowanie zerowych wag z przycinania
+                self.intercepts_[-1] -= self.eta*delta
+                for j in range(self.layers_count-2,0,-1):
+                    if self.activ == "sigmoid":
+                        deri = activation[j]*(1 - activation[j])
+                    else:
+                        deri = (activation[j]>0)*1
+                    delta = np.dot(delta, self.coefs_[j+1].T)*deri
+                    self.coefs_[j+1] -= self.eta*gradient
+                    gradient = np.outer(activation[j-1], delta)
+                    gradient[zero_w[j]] = 0 #zachowanie zerowych wag z przycinania
+                    self.intercepts_[j] -= self.eta*delta
+                if self.activ == "sigmoid":
+                    deri = activation[0]*(1 - activation[0])
+                else:
+                    deri = (activation[0]>0)*1
+                delta = np.dot(delta, self.coefs_[1].T)*deri
+                self.coefs_[1] -= self.eta*gradient
+                gradient = np.outer(X[i], delta)
+                gradient[zero_w[0]] = 0 #zachowanie zerowych wag z przycinania
+                self.intercepts_[0] -= self.eta*delta
+                self.coefs_[0] -= self.eta*gradient
+
+            if accuracy_score(Y_val, self.predict(X_val)) == 1:
+                break
     
     def get_number_of_parametrs(self):
         res = 0
@@ -266,6 +314,50 @@ class MLP_reg:
     
     def predict(self, X):
         return np.array([self._forward(x)[-1] for x in X])
+
+    def refit(self, X, Y, X_val, Y_val, ep):
+        samples = X.shape[0]
+        zero_w = [None]*self.layers_count
+        for i in range(self.layers_count):
+            zero_w[i] = (self.coefs_[i] == 0)
+
+        for _ in range(ep):
+            ind = np.arange(samples)
+            if self.shuffle:
+                np.random.shuffle(ind)
+            if self.part is not None:
+                ind = ind[:int(samples*self.part)]
+            
+            for i in ind:
+                activation = self._forward(X[i])
+                deri = 1 #pochodna x to 1 (funkcja aktywacji jest funkcją liniową)
+                delta = (activation[-1] - Y[i])*deri
+                gradient = np.outer(activation[-2], delta)
+                gradient[zero_w[-1]] = 0 #zachowanie zerowych wag z przycinania
+                self.intercepts_[-1] -= self.eta*delta
+                for j in range(self.layers_count-2,0,-1):
+                    if self.activ == "sigmoid":
+                        deri = activation[j]*(1 - activation[j])
+                    else:
+                        deri = (activation[j]>0)*1
+                    delta = np.dot(delta, self.coefs_[j+1].T)*deri
+                    self.coefs_[j+1] -= self.eta*gradient
+                    gradient = np.outer(activation[j-1], delta)
+                    gradient[zero_w[j]] = 0 #zachowanie zerowych wag z przycinania
+                    self.intercepts_[j] -= self.eta*delta
+                if self.activ == "sigmoid":
+                    deri = activation[0]*(1 - activation[0])
+                else:
+                    deri = (activation[0]>0)*1
+                delta = np.dot(delta, self.coefs_[1].T)*deri
+                self.coefs_[1] -= self.eta*gradient
+                gradient = np.outer(X[i], delta)
+                gradient[zero_w[0]] = 0 #zachowanie zerowych wag z przycinania
+                self.intercepts_[0] -= self.eta*delta
+                self.coefs_[0] -= self.eta*gradient
+
+            if mean_squared_error(Y_val, self.predict(X_val)) <= 1e-5:
+                break
     
     def get_number_of_parametrs(self):
         res = 0
@@ -294,7 +386,7 @@ class MLP_reg:
 
 
 
-def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True): #lost - maksymalna procentowa utrata dokładności podczas przycinania
+def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -368,13 +460,14 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True)
                 break
         del_w += 1
     if if_clf:
-        miar = acc
+        miar = accuracy_score(y_v, clf_reg.predict(X_v))
     else:
-        miar = error
-    #clf_reg.refit(X_t, y_t, X_v, y_v) #NAPISAĆ METODĘ DOSTARAJAJĄCĄ PO PRZYCINANIU!!!
+        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+    if refit:
+        clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return del_w, miar
 
-def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True): #lost - maksymalna procentowa utrata dokładności podczas przycinania
+def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -455,13 +548,14 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
                 break
         del_w += 1
     if if_clf:
-        miar = acc
+        miar = accuracy_score(y_v, clf_reg.predict(X_v))
     else:
-        miar = error
-    #clf_reg.refit(X_t, y_t, X_v, y_v) #NAPISAĆ METODĘ DOSTARAJAJĄCĄ PO PRZYCINANIU!!!
+        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+    if refit:
+        clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return del_w, miar
 
-def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True): #lost - maksymalna procentowa utrata dokładności podczas przycinania
+def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -538,13 +632,14 @@ def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True)
                 break
         del_w += 1
     if if_clf:
-        miar = acc
+        miar = accuracy_score(y_v, clf_reg.predict(X_v))
     else:
-        miar = error
-    #clf_reg.refit(X_t, y_t, X_v, y_v) #NAPISAĆ METODĘ DOSTARAJAJĄCĄ PO PRZYCINANIU!!!
+        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+    if refit:
+        clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return del_w, miar
 
-def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True): #lost - maksymalna procentowa utrata dokładności podczas przycinania
+def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -629,34 +724,36 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
                 break
         del_w += 1
     if if_clf:
-        miar = acc
+        miar = accuracy_score(y_v, clf_reg.predict(X_v))
     else:
-        miar = error
-    #clf_reg.refit(X_t, y_t, X_v, y_v) #NAPISAĆ METODĘ DOSTARAJAJĄCĄ PO PRZYCINANIU!!!
+        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+    if refit:
+        clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return del_w, miar
 
    
 
 #test działania
-#data = pd.read_csv("iris.data")
-#X = data.iloc[:,1:4].values
-#Y = data.iloc[:,4].values
-#X_train, X_test, y_train, y_test = train_test_split(X, Y)
-#clf = MLP_clf(epochs=100, activation="sigmoid")
-#clf.fit(X_train, y_train)
-##print(clf.coefs_)
+data = pd.read_csv("iris.data")
+X = data.iloc[:,0:4].values
+Y = data.iloc[:,4].values
+X_train, X_test, y_train, y_test = train_test_split(X, Y)
+clf = MLP_clf(epochs=100, activation="sigmoid")
+clf.fit(X_train, y_train)
+#print(clf.coefs_)
+print(accuracy_score(y_train, clf.predict(X_train)))
 
-#ll = 0.05
+ll = 0.05
 
-#clf1 = copy.deepcopy(clf)
-#a, d1 = simple_pruning(clf1, ll, X_train, y_train)
-#print(a)
-#print(d1)
-##print(clf1.coefs_)
+clf1 = copy.deepcopy(clf)
+a, d1 = simple_pruning(clf1, ll, X_train, y_train, ep=5)
+print(a)
+print(d1)
+#print(clf1.coefs_)
 
-#print(accuracy_score(y_train, clf1.predict(X_train)))
-#print(accuracy_score(y_test, clf1.predict(X_test)))
-#print()
+print(accuracy_score(y_train, clf1.predict(X_train)))
+print(accuracy_score(y_test, clf1.predict(X_test)))
+print()
 
 
 #clf2 = copy.deepcopy(clf)
@@ -691,16 +788,18 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
 #print(accuracy_score(y_test, clf4.predict(X_test)))
 #print()
 
+
 x = np.sort(np.random.uniform(-2,2,20)).reshape(-1,1)
 y = 2*x + 1
 
 reg = MLP_reg(activation="sigmoid")
 reg.fit(x,y)
-print(reg.coefs_)
+#print(reg.coefs_)
 print(mean_squared_error(y, reg.predict(x)))
 
-#a, d1 = simple_pruning(reg, 0.1, x, y)
-#print(a)
-#print(d1)
+reg1 = copy.deepcopy(reg)
+a, d1 = simple_pruning(reg1, 0.1, x, y)
+print(a)
+print(d1)
 
-#print(mean_squared_error(y, reg.predict(x)))
+print(mean_squared_error(y, reg1.predict(x)))
