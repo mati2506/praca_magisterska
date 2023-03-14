@@ -731,8 +731,9 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return del_w, miar
 
-
-def p_c_n_1(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #nazwa robocza dla szablonu
+#https://www.sciencedirect.com/science/article/pii/S0263224114002796#b0085
+#https://ieeexplore.ieee.org/abstract/document/1047927
+def p_c_n_1(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #nazwa robocza dla szablonu; może FBI - ustawiamy wyjście neuronu na 0 i sprawdzamy wpływ tego na wyjście
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
