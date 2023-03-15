@@ -1,4 +1,5 @@
-﻿import numpy as np
+﻿from socket import if_indextoname
+import numpy as np
 import pandas as pd
 import time
 import matplotlib.pyplot as plt
@@ -731,9 +732,8 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return del_w, miar
 
-#https://www.sciencedirect.com/science/article/pii/S0263224114002796#b0085
-#https://ieeexplore.ieee.org/abstract/document/1047927
-def p_c_n_1(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #nazwa robocza dla szablonu; może FBI - ustawiamy wyjście neuronu na 0 i sprawdzamy wpływ tego na wyjście
+
+def FBI_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -754,14 +754,38 @@ def p_c_n_1(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #na
 
     tmp_ind = [None]*l_c #numer neuronu z każdej warstwy, który jest kandydatem do usunięcia
     tmp_val = [None]*l_c #wartość zmiannej decyzyjnej dla tego neuronu
+    tmp_ind[0] = np.nan #neurony wejściowe (atrybuty) nie są przycinane; pominięcie warstwy wejściowej
+    tmp_val[0] = np.nan #neurony wejściowe (atrybuty) nie są przycinane; pominięcie warstwy wejściowej
     while del_n < (num_of_hidden_neurons - (l_c-1)): #odjęta liczba warstw ukrytych, bo w każdej warstwie musi zostać conajmiej 1 neuron
         last_w = copy.deepcopy(clf_reg.coefs_)
         last_b = copy.deepcopy(clf_reg.intercepts_)
+        
+        if if_clf:
+            y = np.zeros((y_t.shape[0], clf_reg.class_count)) #tablica potrzebna do obliczenia błędów średniokwadratowych w przypadku klasyfikacji
+            for i in range(y_t.shape[0]):
+                y[i,np.where(clf_reg.class_labels_==y_t[i])[0]] = 1
+        else:
+            y = y_t.copy()
+        for i in range(1,l_c):
+            n_n_i_l = clf_reg.coefs_[i].shape[0] #liczba neuroów w danej warstwie ukrytej
+            if n_n_i_l < 2:
+                tmp_ind[i] = 0
+                tmp_val[i] = np.nan
+            else:
+                Sj = np.zeros(n_n_i_l)
+                for j in range(n_n_i_l):
+                    tmp_net = copy.deepcopy(clf_reg)
+                    tmp_net.coefs_[i][j,:] = 0 #ustawienie wag wyjściowych z neuronu na 0 - zasymulowanie, że wartość neuronu jest zerowa
+                    if if_clf:
+                        y_pred = tmp_net.predict_proba(X_t)
+                    else:
+                        y_pred = tmp_net.predict(X_t)
+                    Sj[j] = mean_squared_error(y, y_pred)
+                tmp_ind[i] = np.argmin(Sj)
+                tmp_val[i] = Sj[tmp_ind[i]]
 
-        #wyliczenie zgodnie z wybraną metodą, który neuron ma zostać usunięty - CZĘŚĆ DO DOPISANIA
-
-        tmp = 0 #numer warstwy, z której neuron ma zostać usunięty
-        ind = 0 #numer neuronu, który ma zostać usunięty
+        tmp = np.nanargmin(tmp_val) #numer warstwy ukrytej, z której neuron ma zostać usunięty
+        ind = tmp_ind[tmp] #numer neuronu, który ma zostać usunięty
 
         clf_reg.coefs_[tmp] = np.delete(clf_reg.coefs_[tmp], ind, 0)
         clf_reg.coefs_[tmp-1] = np.delete(clf_reg.coefs_[tmp-1], ind, 1)
@@ -820,7 +844,7 @@ def p_c_n_2(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #na
         #wyliczenie zgodnie z wybraną metodą, który neuron ma zostać usunięty - CZĘŚĆ DO DOPISANIA
 
         tmp = 0 #numer warstwy, z której neuron ma zostać usunięty
-        ind = 0 #numer neuronu, który ma zostać usunięty
+        ind = tmp_ind[tmp] #numer neuronu, który ma zostać usunięty
 
         clf_reg.coefs_[tmp] = np.delete(clf_reg.coefs_[tmp], ind, 0)
         clf_reg.coefs_[tmp-1] = np.delete(clf_reg.coefs_[tmp-1], ind, 1)
@@ -865,15 +889,15 @@ print(accuracy_score(y_train, clf.predict(X_train)))
 
 ll = 0.05
 
-clf1 = copy.deepcopy(clf)
-a, d1 = simple_pruning(clf1, ll, X_train, y_train, ep=5)
-print(a)
-print(d1)
-#print(clf1.coefs_)
+#clf1 = copy.deepcopy(clf)
+#a, d1 = simple_pruning(clf1, ll, X_train, y_train)
+#print(a)
+#print(d1)
+##print(clf1.coefs_)
 
-print(accuracy_score(y_train, clf1.predict(X_train)))
-print(accuracy_score(y_test, clf1.predict(X_test)))
-print()
+#print(accuracy_score(y_train, clf1.predict(X_train)))
+#print(accuracy_score(y_test, clf1.predict(X_test)))
+#print()
 
 
 #clf2 = copy.deepcopy(clf)
@@ -908,6 +932,16 @@ print()
 #print(accuracy_score(y_test, clf4.predict(X_test)))
 #print()
 
+clf5 = copy.deepcopy(clf)
+e, d5 = FBI_pruning(clf5, ll, X_train, y_train)
+print(e)
+print(d5)
+#print(clf5.coefs_)
+
+print(accuracy_score(y_train, clf5.predict(X_train)))
+print(accuracy_score(y_test, clf5.predict(X_test)))
+print()
+
 
 x = np.sort(np.random.uniform(-2,2,20)).reshape(-1,1)
 y = 2*x + 1
@@ -918,7 +952,7 @@ reg.fit(x,y)
 print(mean_squared_error(y, reg.predict(x)))
 
 reg1 = copy.deepcopy(reg)
-a, d1 = simple_pruning(reg1, 0.1, x, y)
+a, d1 = FBI_pruning(reg1, 0.15, x, y)
 print(a)
 print(d1)
 
