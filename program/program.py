@@ -816,7 +816,11 @@ def FBI_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20):
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return del_n, miar
 
-def p_c_n_2(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #nazwa robocza dla szablonu
+def APER(y_true, y_pred): #miara potrzebna do kolejnej metody przycinania - tylko dla klasyfikacji; interpretowane jako 1-dokładność
+    matrix = confusion_matrix(y_true, y_pred)
+    return (matrix[0,1] + matrix[1,0])/np.sum(matrix)
+
+def APERT_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -837,13 +841,32 @@ def p_c_n_2(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #na
 
     tmp_ind = [None]*l_c #numer neuronu z każdej warstwy, który jest kandydatem do usunięcia
     tmp_val = [None]*l_c #wartość zmiannej decyzyjnej dla tego neuronu
+    tmp_ind[0] = np.nan #neurony wejściowe (atrybuty) nie są przycinane; pominięcie warstwy wejściowej
+    tmp_val[0] = np.nan #neurony wejściowe (atrybuty) nie są przycinane; pominięcie warstwy wejściowej
     while del_n < (num_of_hidden_neurons - (l_c-1)): #odjęta liczba warstw ukrytych, bo w każdej warstwie musi zostać conajmiej 1 neuron
         last_w = copy.deepcopy(clf_reg.coefs_)
         last_b = copy.deepcopy(clf_reg.intercepts_)
 
-        #wyliczenie zgodnie z wybraną metodą, który neuron ma zostać usunięty - CZĘŚĆ DO DOPISANIA
+        y_pred0 = clf_reg.predict(X_t) #predykcja przed daną itracją przycinania
+        for i in range(1,l_c):
+            n_n_i_l = clf_reg.coefs_[i].shape[0] #liczba neuroów w danej warstwie ukrytej
+            if n_n_i_l < 2:
+                tmp_ind[i] = 0
+                tmp_val[i] = np.nan
+            else:
+                Sj = np.zeros(n_n_i_l)
+                for j in range(n_n_i_l):
+                    tmp_net = copy.deepcopy(clf_reg)
+                    tmp_net.coefs_[i][j,:] = 0 #ustawienie wag wyjściowych z neuronu na 0 - zasymulowanie, że wartość neuronu jest zerowa
+                    y_pred = tmp_net.predict(X_t)
+                    if if_clf:
+                        Sj[j] = APER(y_t, y_pred) - APER(y_t, y_pred0)
+                    else:
+                        Sj[j] = mean_squared_error(y_t, y_pred) - mean_squared_error(y_t, y_pred0) #dla regresji miara APER zastępiona błędem średniokwadratowym
+                tmp_ind[i] = np.argmin(Sj)
+                tmp_val[i] = Sj[tmp_ind[i]]
 
-        tmp = 0 #numer warstwy, z której neuron ma zostać usunięty
+        tmp = np.nanargmin(tmp_val) #numer warstwy, z której neuron ma zostać usunięty
         ind = tmp_ind[tmp] #numer neuronu, który ma zostać usunięty
 
         clf_reg.coefs_[tmp] = np.delete(clf_reg.coefs_[tmp], ind, 0)
@@ -933,7 +956,7 @@ ll = 0.05
 #print()
 
 clf5 = copy.deepcopy(clf)
-e, d5 = FBI_pruning(clf5, ll, X_train, y_train)
+e, d5 = APERT_pruning(clf5, ll, X_train, y_train)
 print(e)
 print(d5)
 #print(clf5.coefs_)
@@ -952,7 +975,7 @@ reg.fit(x,y)
 print(mean_squared_error(y, reg.predict(x)))
 
 reg1 = copy.deepcopy(reg)
-a, d1 = FBI_pruning(reg1, 0.15, x, y)
+a, d1 = APERT_pruning(reg1, 0.15, x, y)
 print(a)
 print(d1)
 
