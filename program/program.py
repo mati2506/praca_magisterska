@@ -818,7 +818,8 @@ def FBI_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20):
 
 def APER(y_true, y_pred): #miara potrzebna do kolejnej metody przycinania - tylko dla klasyfikacji; interpretowane jako 1-dokładność
     matrix = confusion_matrix(y_true, y_pred)
-    return (matrix[0,1] + matrix[1,0])/np.sum(matrix)
+    l_e = np.sum(matrix)
+    return (l_e - np.trace(matrix))/l_e
 
 def APERT_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
     if clf_reg.coefs_[-1].shape[1] == 1:
@@ -860,9 +861,9 @@ def APERT_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20
                     tmp_net.coefs_[i][j,:] = 0 #ustawienie wag wyjściowych z neuronu na 0 - zasymulowanie, że wartość neuronu jest zerowa
                     y_pred = tmp_net.predict(X_t)
                     if if_clf:
-                        Sj[j] = APER(y_t, y_pred) - APER(y_t, y_pred0)
+                        Sj[j] = np.abs(APER(y_t, y_pred) - APER(y_t, y_pred0))
                     else:
-                        Sj[j] = mean_squared_error(y_t, y_pred) - mean_squared_error(y_t, y_pred0) #dla regresji miara APER zastępiona błędem średniokwadratowym
+                        Sj[j] = np.abs(mean_squared_error(y_t, y_pred) - mean_squared_error(y_t, y_pred0)) #dla regresji miara APER zastępiona błędem średniokwadratowym
                 tmp_ind[i] = np.argmin(Sj)
                 tmp_val[i] = Sj[tmp_ind[i]]
 
