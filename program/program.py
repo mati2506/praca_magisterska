@@ -877,9 +877,9 @@ def APERT_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20
                     tmp_net.coefs_[i][j,:] = 0 #ustawienie wag wyjściowych z neuronu na 0 - zasymulowanie, że wartość neuronu jest zerowa
                     y_pred = tmp_net.predict(X_t)
                     if if_clf:
-                        Sj[j] = np.abs(APER(y_t, y_pred) - APER(y_t, y_pred0))
+                        Sj[j] = APER(y_t, y_pred) - APER(y_t, y_pred0)
                     else:
-                        Sj[j] = np.abs(mean_squared_error(y_t, y_pred) - mean_squared_error(y_t, y_pred0)) #dla regresji miara APER zastępiona błędem średniokwadratowym
+                        Sj[j] = mean_squared_error(y_t, y_pred) - mean_squared_error(y_t, y_pred0) #dla regresji miara APER zastępiona błędem średniokwadratowym
                 tmp_ind[i] = np.argmin(Sj)
                 tmp_val[i] = Sj[tmp_ind[i]]
 
@@ -915,6 +915,18 @@ def APERT_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return del_n, miar
+
+def class_dE_zj(clf, x, y, layer, l_c): #chyba źle rozumiem wzór - przycinanie Optimal Brain Damage
+    activation = clf._forward(x)
+    if layer == l_c-1:
+        deri = activation[layer]*(1 - activation[layer]) #zmienić na pochodną softmax, jakbym użył takiej funkci aktywacji
+    elif clf.activ == "sigmoid":
+        deri = activation[layer]*(1 - activation[layer])
+    else:
+        deri = (activation[layer]>0)*1
+    return 0.5*deri*((-activation[layer])**2)
+
+#może metoda Dynamic Pruning (PD) - do zaimplementowania
 
    
 
