@@ -916,6 +916,93 @@ def APERT_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return del_n, miar
 
+def APERP(y_true, y_pred): #miara potrzebna do kolejnej metody przycinania - tylko dla klasyfikacji
+    matrix = confusion_matrix(y_true, y_pred)
+    sums = np.sum(matrix, axis=1)
+    return np.sum((sums - np.diag(matrix))/sums)/matrix.shape[0]
+
+def APERTP_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania; dla regresji działa identycznie, jak APERT
+    if clf_reg.coefs_[-1].shape[1] == 1:
+        if_clf = False
+    else:
+        if_clf = True
+
+    if X_v is None or y_v is None:
+        X_v = X_t.copy()
+        y_v = y_t.copy()
+
+    if if_clf:
+        in_acc = accuracy_score(y_v, clf_reg.predict(X_v))
+    else:
+        in_error = mean_squared_error(y_v, clf_reg.predict(X_v))
+
+    l_c = clf_reg.layers_count
+    num_of_hidden_neurons = np.sum(clf_reg.hidden)
+    del_n = 0
+
+    tmp_ind = [None]*l_c #numer neuronu z każdej warstwy, który jest kandydatem do usunięcia
+    tmp_val = [None]*l_c #wartość zmiannej decyzyjnej dla tego neuronu
+    tmp_ind[0] = np.nan #neurony wejściowe (atrybuty) nie są przycinane; pominięcie warstwy wejściowej
+    tmp_val[0] = np.nan #neurony wejściowe (atrybuty) nie są przycinane; pominięcie warstwy wejściowej
+    while del_n < (num_of_hidden_neurons - (l_c-1)): #odjęta liczba warstw ukrytych, bo w każdej warstwie musi zostać conajmiej 1 neuron
+        last_w = copy.deepcopy(clf_reg.coefs_)
+        last_b = copy.deepcopy(clf_reg.intercepts_)
+
+        y_pred0 = clf_reg.predict(X_t) #predykcja przed daną itracją przycinania
+        for i in range(1,l_c):
+            n_n_i_l = clf_reg.coefs_[i].shape[0] #liczba neuroów w danej warstwie ukrytej
+            if n_n_i_l < 2:
+                tmp_ind[i] = 0
+                tmp_val[i] = np.nan
+            else:
+                Sj = np.zeros(n_n_i_l)
+                for j in range(n_n_i_l):
+                    tmp_net = copy.deepcopy(clf_reg)
+                    tmp_net.coefs_[i][j,:] = 0 #ustawienie wag wyjściowych z neuronu na 0 - zasymulowanie, że wartość neuronu jest zerowa
+                    y_pred = tmp_net.predict(X_t)
+                    if if_clf:
+                        Sj[j] = APERP(y_t, y_pred) - APERP(y_t, y_pred0)
+                    else:
+                        Sj[j] = mean_squared_error(y_t, y_pred) - mean_squared_error(y_t, y_pred0) #dla regresji miara APERP zastępiona błędem średniokwadratowym
+                tmp_ind[i] = np.argmin(Sj)
+                tmp_val[i] = Sj[tmp_ind[i]]
+
+        tmp = np.nanargmin(tmp_val) #numer (+1) warstwy ukrytej, z której neuron ma zostać usunięty
+        ind = tmp_ind[tmp] #numer neuronu, który ma zostać usunięty
+
+        clf_reg.coefs_[tmp] = np.delete(clf_reg.coefs_[tmp], ind, 0)
+        clf_reg.coefs_[tmp-1] = np.delete(clf_reg.coefs_[tmp-1], ind, 1)
+        clf_reg.intercepts_[tmp-1] = np.delete(clf_reg.intercepts_[tmp-1], ind, 0)
+
+        if if_clf:
+            acc = accuracy_score(y_v, clf_reg.predict(X_v))
+            if acc > in_acc: #dokładność wzrosła, od teraz maksymalna utrata dokłądności liczona względem wyższej dokładności
+                in_acc = acc
+            elif acc < in_acc*(1-lost):
+                clf_reg.coefs_ = copy.deepcopy(last_w)
+                clf_reg.intercepts_ = copy.deepcopy(last_b)
+                break
+        else:
+            error = mean_squared_error(y_v, clf_reg.predict(X_v))
+            if error < in_error: #błąd zmalał, od teraz maksymalny wzrost błędu liczony względem mniejszego błędu
+                in_error = error
+            elif error > in_error*(1+lost):
+                clf_reg.coefs_ = copy.deepcopy(last_w)
+                clf_reg.intercepts_ = copy.deepcopy(last_b)
+                break
+        clf_reg.hidden[tmp-1] -= 1 #aktualizacja liczby neuronów w warstwie ukrytej, z której nauron jest usuwany
+        del_n += 1
+    if if_clf:
+        miar = accuracy_score(y_v, clf_reg.predict(X_v))
+    else:
+        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+    if refit:
+        clf_reg.refit(X_t, y_t, X_v, y_v, ep)
+    return del_n, miar
+
+
+
+
 def class_dE_zj(clf, x, y, layer, l_c): #chyba źle rozumiem wzór - przycinanie Optimal Brain Damage
     activation = clf._forward(x)
     if layer == l_c-1:
@@ -1012,6 +1099,19 @@ print(clf6.hidden)
 print(accuracy_score(y_train, clf6.predict(X_train)))
 print(accuracy_score(y_test, clf6.predict(X_test)))
 print()
+
+
+clf7 = copy.deepcopy(clf)
+g, d7 = APERTP_pruning(clf7, ll, X_train, y_train)
+print(g)
+print(d7)
+#print(clf7.coefs_)
+print(clf7.hidden)
+
+print(accuracy_score(y_train, clf7.predict(X_train)))
+print(accuracy_score(y_test, clf7.predict(X_test)))
+print()
+
 
 
 x = np.sort(np.random.uniform(-2,2,20)).reshape(-1,1)
