@@ -1028,15 +1028,86 @@ def PD_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): 
         last_b = copy.deepcopy(clf_reg.intercepts_)
 
         activ = clf_reg._forward(X_t)
-        for i in range(0,l_c-1):
+        for i in range(1,l_c):
             n_n_i_l = clf_reg.coefs_[i].shape[0] #liczba neuroów w danej warstwie ukrytej
             if n_n_i_l < 2:
-                tmp_ind[i+1] = 0
-                tmp_val[i+1] = np.nan
+                tmp_ind[i] = 0
+                tmp_val[i] = np.nan
             else:
-                Sj = np.sum(np.sum(clf_reg.coefs_[i]**2, axis=0)*(activ[i]**2), axis=0)/(X_t.shape[0])
-                tmp_ind[i+1] = np.argmin(Sj)
-                tmp_val[i+1] = Sj[tmp_ind[i+1]]
+                Sj = np.mean(np.sum(clf_reg.coefs_[i-1]**2, axis=0)*(activ[i-1]**2), axis=0)
+                tmp_ind[i] = np.argmin(Sj)
+                tmp_val[i] = Sj[tmp_ind[i]]
+
+        tmp = np.nanargmin(tmp_val) #numer (+1) warstwy ukrytej, z której neuron ma zostać usunięty
+        ind = tmp_ind[tmp] #numer neuronu, który ma zostać usunięty
+
+        clf_reg.coefs_[tmp] = np.delete(clf_reg.coefs_[tmp], ind, 0)
+        clf_reg.coefs_[tmp-1] = np.delete(clf_reg.coefs_[tmp-1], ind, 1)
+        clf_reg.intercepts_[tmp-1] = np.delete(clf_reg.intercepts_[tmp-1], ind, 0)
+
+        if if_clf:
+            acc = accuracy_score(y_v, clf_reg.predict(X_v))
+            if acc > in_acc: #dokładność wzrosła, od teraz maksymalna utrata dokłądności liczona względem wyższej dokładności
+                in_acc = acc
+            elif acc < in_acc*(1-lost):
+                clf_reg.coefs_ = copy.deepcopy(last_w)
+                clf_reg.intercepts_ = copy.deepcopy(last_b)
+                break
+        else:
+            error = mean_squared_error(y_v, clf_reg.predict(X_v))
+            if error < in_error: #błąd zmalał, od teraz maksymalny wzrost błędu liczony względem mniejszego błędu
+                in_error = error
+            elif error > in_error*(1+lost):
+                clf_reg.coefs_ = copy.deepcopy(last_w)
+                clf_reg.intercepts_ = copy.deepcopy(last_b)
+                break
+        clf_reg.hidden[tmp-1] -= 1 #aktualizacja liczby neuronów w warstwie ukrytej, z której nauron jest usuwany
+        del_n += 1
+    if if_clf:
+        miar = accuracy_score(y_v, clf_reg.predict(X_v))
+    else:
+        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+    if refit:
+        clf_reg.refit(X_t, y_t, X_v, y_v, ep)
+    return del_n, miar
+
+def PEB_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
+    if clf_reg.coefs_[-1].shape[1] == 1:
+        if_clf = False
+    else:
+        if_clf = True
+
+    if X_v is None or y_v is None:
+        X_v = X_t.copy()
+        y_v = y_t.copy()
+
+    if if_clf:
+        in_acc = accuracy_score(y_v, clf_reg.predict(X_v))
+    else:
+        in_error = mean_squared_error(y_v, clf_reg.predict(X_v))
+
+    l_c = clf_reg.layers_count
+    num_of_hidden_neurons = np.sum(clf_reg.hidden)
+    del_n = 0
+
+    tmp_ind = [None]*l_c #numer neuronu z każdej warstwy, który jest kandydatem do usunięcia
+    tmp_val = [None]*l_c #wartość zmiannej decyzyjnej dla tego neuronu
+    tmp_ind[0] = np.nan #neurony wejściowe (atrybuty) nie są przycinane; pominięcie warstwy wejściowej
+    tmp_val[0] = np.nan #neurony wejściowe (atrybuty) nie są przycinane; pominięcie warstwy wejściowej
+    while del_n < (num_of_hidden_neurons - (l_c-1)): #odjęta liczba warstw ukrytych, bo w każdej warstwie musi zostać conajmiej 1 neuron
+        last_w = copy.deepcopy(clf_reg.coefs_)
+        last_b = copy.deepcopy(clf_reg.intercepts_)
+
+        activ = clf_reg._forward(X_t)
+        for i in range(1,l_c):
+            n_n_i_l = clf_reg.coefs_[i].shape[0] #liczba neuroów w danej warstwie ukrytej
+            if n_n_i_l < 2:
+                tmp_ind[i] = 0
+                tmp_val[i] = np.nan
+            else:
+                Sj = np.mean(np.sum(clf_reg.coefs_[i-1], axis=0)*(activ[i-1]), axis=0)
+                tmp_ind[i] = np.argmin(Sj)
+                tmp_val[i] = Sj[tmp_ind[i]]
 
         tmp = np.nanargmin(tmp_val) #numer (+1) warstwy ukrytej, z której neuron ma zostać usunięty
         ind = tmp_ind[tmp] #numer neuronu, który ma zostać usunięty
@@ -1082,7 +1153,7 @@ def class_dE_zj(clf, x, y, layer, l_c): #chyba źle rozumiem wzór - przycinanie
         deri = activation[layer]*(1 - activation[layer])
     else:
         deri = (activation[layer]>0)*1
-    return 0.5*deri*((-activation[layer])**2)
+    return 0.5*deri*((-activation[layer])**2) #dla klasyfikacji w metodzie OBD - dopytać
 
    
 
@@ -1194,6 +1265,18 @@ print(accuracy_score(y_test, clf8.predict(X_test)))
 print()
 
 
+clf9 = copy.deepcopy(clf)
+i, d9 = PD_pruning(clf9, ll, X_train, y_train)
+print(i)
+print(d9)
+#print(clf9.coefs_)
+print(clf9.hidden)
+
+print(accuracy_score(y_train, clf9.predict(X_train)))
+print(accuracy_score(y_test, clf9.predict(X_test)))
+print()
+
+
 
 x = np.sort(np.random.uniform(-2,2,20)).reshape(-1,1)
 y = 2*x + 1
@@ -1204,7 +1287,7 @@ reg.fit(x,y)
 print(mean_squared_error(y, reg.predict(x)))
 
 reg1 = copy.deepcopy(reg)
-aa, dd1 = PD_pruning(reg1, 0.15, x, y)
+aa, dd1 = PEB_pruning(reg1, 0.15, x, y)
 print(aa)
 print(dd1)
 print(reg1.hidden)
