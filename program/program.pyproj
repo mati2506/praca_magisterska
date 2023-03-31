@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>3401b957-df89-4b28-9504-f5979c0b6b9c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>program.py</StartupFile>
+    <StartupFile>main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -24,7 +24,19 @@
     <Compile Include="myPruningMetrics.py" />
     <Compile Include="myNetworkPruning.py" />
     <Compile Include="myMLP.py" />
-    <Compile Include="program.py" />
+    <Compile Include="main.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="data\" />
+    <Folder Include="networks\" />
+    <Folder Include="pruned_networks\" />
+    <Folder Include="raw_data\" />
+    <Folder Include="results\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="data\iris_data.bin" />
+    <Content Include="networks\iris.bin" />
+    <Content Include="raw_data\iris.data" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

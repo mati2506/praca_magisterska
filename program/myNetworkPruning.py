@@ -1,9 +1,12 @@
 ﻿import numpy as np
 from sklearn.metrics import mean_squared_error, accuracy_score
 import copy
+import time
+from datetime import timedelta
 import myPruningMetrics as met
 
 def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
+    start_time = time.time()
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -86,9 +89,10 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
         miar = mean_squared_error(y_v, clf_reg.predict(X_v))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
-    return [del_w, del_n], miar
+    return [del_w, del_n], miar, str(timedelta(seconds=(time.time()-start_time)))
 
 def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
+    start_time = time.time()
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -178,9 +182,10 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
         miar = mean_squared_error(y_v, clf_reg.predict(X_v))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
-    return [del_w, del_n], miar
+    return [del_w, del_n], miar, str(timedelta(seconds=(time.time()-start_time)))
 
 def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
+    start_time = time.time()
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -266,9 +271,10 @@ def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
         miar = mean_squared_error(y_v, clf_reg.predict(X_v))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
-    return [del_w, del_n], miar
+    return [del_w, del_n], miar, str(timedelta(seconds=(time.time()-start_time)))
 
 def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
+    start_time = time.time()
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -362,10 +368,11 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
         miar = mean_squared_error(y_v, clf_reg.predict(X_v))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
-    return [del_w, del_n], miar
+    return [del_w, del_n], miar, str(timedelta(seconds=(time.time()-start_time)))
 
 
 def FBI_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
+    start_time = time.time()
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -447,9 +454,10 @@ def FBI_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20):
         miar = mean_squared_error(y_v, clf_reg.predict(X_v))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
-    return del_n, miar
+    return del_n, miar, str(timedelta(seconds=(time.time()-start_time)))
 
 def APERT_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
+    start_time = time.time()
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -526,9 +534,10 @@ def APERT_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20
         miar = mean_squared_error(y_v, clf_reg.predict(X_v))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
-    return del_n, miar
+    return del_n, miar, str(timedelta(seconds=(time.time()-start_time)))
 
 def APERTP_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania; dla regresji działa identycznie, jak APERT
+    start_time = time.time()
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -605,9 +614,10 @@ def APERTP_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=2
         miar = mean_squared_error(y_v, clf_reg.predict(X_v))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
-    return del_n, miar
+    return del_n, miar, str(timedelta(seconds=(time.time()-start_time)))
 
 def PD_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
+    start_time = time.time()
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -676,9 +686,10 @@ def PD_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): 
         miar = mean_squared_error(y_v, clf_reg.predict(X_v))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
-    return del_n, miar
+    return del_n, miar, str(timedelta(seconds=(time.time()-start_time)))
 
 def PEB_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): #lost - maksymalna procentowa utrata dokładności podczas przycinania
+    start_time = time.time()
     if clf_reg.coefs_[-1].shape[1] == 1:
         if_clf = False
     else:
@@ -747,4 +758,4 @@ def PEB_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20):
         miar = mean_squared_error(y_v, clf_reg.predict(X_v))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
-    return del_n, miar
+    return del_n, miar, str(timedelta(seconds=(time.time()-start_time)))
