@@ -189,17 +189,6 @@ class Classifier:
             num += w*h
         return num
 
-    def outs_of_single_weight(self, X, number, index):
-        w = X.shape[0]
-        outs = np.zeros(w)
-        for j in range(w):
-            activation_i = X[j].copy()
-            for i in range(number):
-                sum_out = np.dot(activation_i, self.coefs_[i]) + self.intercepts_[i]
-                activation_i = self._sigmoid(sum_out)
-            outs[j] = activation_i[index[0]]*self.coefs_[number][index]
-        return outs
-
 
 
 class Regressor:
@@ -367,14 +356,3 @@ class Regressor:
             w, h = coef.shape
             num += w*h
         return num
-
-    def outs_of_single_weight(self, X, number, index):
-        w = X.shape[0]
-        outs = np.zeros(w)
-        for j in range(w):
-            activation_i = X[j].copy()
-            for i in range(number):
-                sum_out = np.dot(activation_i, self.coefs_[i]) + self.intercepts_[i]
-                activation_i = self._sigmoid(sum_out)
-            outs[j] = activation_i[index[0]]*self.coefs_[number][index]
-        return outs
