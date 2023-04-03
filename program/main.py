@@ -183,19 +183,19 @@ print()
 
 
 
-x = np.sort(np.random.uniform(-2,2,250)).reshape(-1,1)
-y = 2*x + 1
+#x = np.sort(np.random.uniform(-2,2,250)).reshape(-1,1)
+#y = 2*x + 1
 
-reg = myMLP.Regressor(activation="sigmoid")
-reg.fit(x,y)
-#print(reg.coefs_)
-print(mean_squared_error(y, reg.predict(x)))
+#reg = myMLP.Regressor(activation="sigmoid")
+#reg.fit(x,y)
+##print(reg.coefs_)
+#print(mean_squared_error(y, reg.predict(x)))
 
-reg1 = copy.deepcopy(reg)
-aa, dd1, tt1 = prune.FBI_pruning(reg1, 1, x, y)
-print(aa)
-print(dd1)
-print(tt1)
-print(reg1.hidden)
+#reg1 = copy.deepcopy(reg)
+#aa, dd1, tt1 = prune.FBI_pruning(reg1, 1, x, y)
+#print(aa)
+#print(dd1)
+#print(tt1)
+#print(reg1.hidden)
 
-print(mean_squared_error(y, reg1.predict(x)))
+#print(mean_squared_error(y, reg1.predict(x)))
