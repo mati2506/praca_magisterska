@@ -36,7 +36,13 @@
   <ItemGroup>
     <Content Include="data\iris_data.bin" />
     <Content Include="networks\iris.bin" />
+    <Content Include="raw_data\Dry_Bean_Dataset.xlsx" />
+    <Content Include="raw_data\Electrical_Grid.csv" />
+    <Content Include="raw_data\Frogs_MFCCs.csv" />
     <Content Include="raw_data\iris.data" />
+    <Content Include="raw_data\parkinsons_updrs.data" />
+    <Content Include="raw_data\propulsion_plants.txt" />
+    <Content Include="raw_data\riceClassification.csv" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
