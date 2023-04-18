@@ -17,9 +17,9 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
         y_v = y_t.copy()
 
     if if_clf:
-        in_acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        in_acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        in_error = mean_squared_error(y_v, clf_reg.predict(X_v))
+        in_error = mean_squared_error(y_t, clf_reg.predict(X_t))
 
     l_c = clf_reg.layers_count
     num_of_coefs = clf_reg.get_nuber_of_coefs()
@@ -65,7 +65,7 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
                             break
 
         if if_clf:
-            acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+            acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
             if acc > in_acc: #dokładność wzrosła, od teraz maksymalna utrata dokłądności liczona względem wyższej dokładności
                 in_acc = acc
             elif acc < in_acc*(1-lost):
@@ -73,7 +73,7 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         else:
-            error = mean_squared_error(y_v, clf_reg.predict(X_v))
+            error = mean_squared_error(y_t, clf_reg.predict(X_t))
             if error < in_error: #błąd zmalał, od teraz maksymalny wzrost błędu liczony względem mniejszego błędu
                 in_error = error
             elif error > in_error*(1+lost):
@@ -84,9 +84,9 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
     for i in range(l_c-1): #aktualizacja liczby neuronów w warstwach ukrytych po przycinaniu
         clf_reg.hidden[i] = clf_reg.coefs_[i].shape[1]
     if if_clf:
-        miar = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        miar = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+        miar = mean_squared_error(y_t, clf_reg.predict(X_t))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return [del_w, del_n], miar, str(timedelta(seconds=(time.time()-start_time)))
@@ -103,9 +103,9 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
         y_v = y_t.copy()
 
     if if_clf:
-        in_acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        in_acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        in_error = mean_squared_error(y_v, clf_reg.predict(X_v))
+        in_error = mean_squared_error(y_t, clf_reg.predict(X_t))
 
     l_c = clf_reg.layers_count
     num_of_coefs = clf_reg.get_nuber_of_coefs()
@@ -158,7 +158,7 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
                             break
 
         if if_clf:
-            acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+            acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
             if acc > in_acc: #dokładność wzrosła, od teraz maksymalna utrata dokłądności liczona względem wyższej dokładności
                 in_acc = acc
             elif acc < in_acc*(1-lost):
@@ -166,7 +166,7 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         else:
-            error = mean_squared_error(y_v, clf_reg.predict(X_v))
+            error = mean_squared_error(y_t, clf_reg.predict(X_t))
             if error < in_error: #błąd zmalał, od teraz maksymalny wzrost błędu liczony względem mniejszego błędu
                 in_error = error
             elif error > in_error*(1+lost):
@@ -177,9 +177,9 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
     for i in range(l_c-1): #aktualizacja liczby neuronów w warstwach ukrytych po przycinaniu
         clf_reg.hidden[i] = clf_reg.coefs_[i].shape[1]
     if if_clf:
-        miar = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        miar = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+        miar = mean_squared_error(y_t, clf_reg.predict(X_t))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return [del_w, del_n], miar, str(timedelta(seconds=(time.time()-start_time)))
@@ -196,9 +196,9 @@ def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
         y_v = y_t.copy()
 
     if if_clf:
-        in_acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        in_acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        in_error = mean_squared_error(y_v, clf_reg.predict(X_v))
+        in_error = mean_squared_error(y_t, clf_reg.predict(X_t))
 
     l_c = clf_reg.layers_count
     num_of_coefs = clf_reg.get_nuber_of_coefs()
@@ -247,7 +247,7 @@ def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
                             break
 
         if if_clf:
-            acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+            acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
             if acc > in_acc: #dokładność wzrosła, od teraz maksymalna utrata dokłądności liczona względem wyższej dokładności
                 in_acc = acc
             elif acc < in_acc*(1-lost):
@@ -255,7 +255,7 @@ def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         else:
-            error = mean_squared_error(y_v, clf_reg.predict(X_v))
+            error = mean_squared_error(y_t, clf_reg.predict(X_t))
             if error < in_error: #błąd zmalał, od teraz maksymalny wzrost błędu liczony względem mniejszego błędu
                 in_error = error
             elif error > in_error*(1+lost):
@@ -266,9 +266,9 @@ def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
     for i in range(l_c-1): #aktualizacja liczby neuronów w warstwach ukrytych po przycinaniu
         clf_reg.hidden[i] = clf_reg.coefs_[i].shape[1]
     if if_clf:
-        miar = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        miar = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+        miar = mean_squared_error(y_t, clf_reg.predict(X_t))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return [del_w, del_n], miar, str(timedelta(seconds=(time.time()-start_time)))
@@ -285,9 +285,9 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
         y_v = y_t.copy()
 
     if if_clf:
-        in_acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        in_acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        in_error = mean_squared_error(y_v, clf_reg.predict(X_v))
+        in_error = mean_squared_error(y_t, clf_reg.predict(X_t))
 
     l_c = clf_reg.layers_count
     num_of_coefs = clf_reg.get_nuber_of_coefs()
@@ -332,7 +332,7 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
                             break
 
         if if_clf:
-            acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+            acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
             if acc > in_acc: #dokładność wzrosła, od teraz maksymalna utrata dokłądności liczona względem wyższej dokładności
                 in_acc = acc
             elif acc < in_acc*(1-lost):
@@ -340,7 +340,7 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         else:
-            error = mean_squared_error(y_v, clf_reg.predict(X_v))
+            error = mean_squared_error(y_t, clf_reg.predict(X_t))
             if error < in_error: #błąd zmalał, od teraz maksymalny wzrost błędu liczony względem mniejszego błędu
                 in_error = error
             elif error > in_error*(1+lost):
@@ -351,9 +351,9 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
     for i in range(l_c-1): #aktualizacja liczby neuronów w warstwach ukrytych po przycinaniu
         clf_reg.hidden[i] = clf_reg.coefs_[i].shape[1]
     if if_clf:
-        miar = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        miar = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+        miar = mean_squared_error(y_t, clf_reg.predict(X_t))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return [del_w, del_n], miar, str(timedelta(seconds=(time.time()-start_time)))
@@ -371,9 +371,9 @@ def FBI_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20):
         y_v = y_t.copy()
 
     if if_clf:
-        in_acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        in_acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        in_error = mean_squared_error(y_v, clf_reg.predict(X_v))
+        in_error = mean_squared_error(y_t, clf_reg.predict(X_t))
 
     l_c = clf_reg.layers_count
     num_of_hidden_neurons = np.sum(clf_reg.hidden)
@@ -419,7 +419,7 @@ def FBI_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20):
         clf_reg.intercepts_[tmp-1] = np.delete(clf_reg.intercepts_[tmp-1], ind, 0)
 
         if if_clf:
-            acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+            acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
             if acc > in_acc: #dokładność wzrosła, od teraz maksymalna utrata dokłądności liczona względem wyższej dokładności
                 in_acc = acc
             elif acc < in_acc*(1-lost):
@@ -427,7 +427,7 @@ def FBI_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20):
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         else:
-            error = mean_squared_error(y_v, clf_reg.predict(X_v))
+            error = mean_squared_error(y_t, clf_reg.predict(X_t))
             if error < in_error: #błąd zmalał, od teraz maksymalny wzrost błędu liczony względem mniejszego błędu
                 in_error = error
             elif error > in_error*(1+lost):
@@ -437,9 +437,9 @@ def FBI_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20):
         clf_reg.hidden[tmp-1] -= 1 #aktualizacja liczby neuronów w warstwie ukrytej, z której nauron jest usuwany
         del_n += 1
     if if_clf:
-        miar = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        miar = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+        miar = mean_squared_error(y_t, clf_reg.predict(X_t))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return del_n, miar, str(timedelta(seconds=(time.time()-start_time)))
@@ -456,9 +456,9 @@ def APERT_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20
         y_v = y_t.copy()
 
     if if_clf:
-        in_acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        in_acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        in_error = mean_squared_error(y_v, clf_reg.predict(X_v))
+        in_error = mean_squared_error(y_t, clf_reg.predict(X_t))
 
     l_c = clf_reg.layers_count
     num_of_hidden_neurons = np.sum(clf_reg.hidden)
@@ -499,7 +499,7 @@ def APERT_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20
         clf_reg.intercepts_[tmp-1] = np.delete(clf_reg.intercepts_[tmp-1], ind, 0)
 
         if if_clf:
-            acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+            acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
             if acc > in_acc: #dokładność wzrosła, od teraz maksymalna utrata dokłądności liczona względem wyższej dokładności
                 in_acc = acc
             elif acc < in_acc*(1-lost):
@@ -507,7 +507,7 @@ def APERT_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         else:
-            error = mean_squared_error(y_v, clf_reg.predict(X_v))
+            error = mean_squared_error(y_t, clf_reg.predict(X_t))
             if error < in_error: #błąd zmalał, od teraz maksymalny wzrost błędu liczony względem mniejszego błędu
                 in_error = error
             elif error > in_error*(1+lost):
@@ -517,9 +517,9 @@ def APERT_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20
         clf_reg.hidden[tmp-1] -= 1 #aktualizacja liczby neuronów w warstwie ukrytej, z której nauron jest usuwany
         del_n += 1
     if if_clf:
-        miar = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        miar = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+        miar = mean_squared_error(y_t, clf_reg.predict(X_t))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return del_n, miar, str(timedelta(seconds=(time.time()-start_time)))
@@ -536,9 +536,9 @@ def APERTP_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=2
         y_v = y_t.copy()
 
     if if_clf:
-        in_acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        in_acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        in_error = mean_squared_error(y_v, clf_reg.predict(X_v))
+        in_error = mean_squared_error(y_t, clf_reg.predict(X_t))
 
     l_c = clf_reg.layers_count
     num_of_hidden_neurons = np.sum(clf_reg.hidden)
@@ -579,7 +579,7 @@ def APERTP_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=2
         clf_reg.intercepts_[tmp-1] = np.delete(clf_reg.intercepts_[tmp-1], ind, 0)
 
         if if_clf:
-            acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+            acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
             if acc > in_acc: #dokładność wzrosła, od teraz maksymalna utrata dokłądności liczona względem wyższej dokładności
                 in_acc = acc
             elif acc < in_acc*(1-lost):
@@ -587,7 +587,7 @@ def APERTP_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=2
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         else:
-            error = mean_squared_error(y_v, clf_reg.predict(X_v))
+            error = mean_squared_error(y_t, clf_reg.predict(X_t))
             if error < in_error: #błąd zmalał, od teraz maksymalny wzrost błędu liczony względem mniejszego błędu
                 in_error = error
             elif error > in_error*(1+lost):
@@ -597,9 +597,9 @@ def APERTP_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=2
         clf_reg.hidden[tmp-1] -= 1 #aktualizacja liczby neuronów w warstwie ukrytej, z której nauron jest usuwany
         del_n += 1
     if if_clf:
-        miar = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        miar = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+        miar = mean_squared_error(y_t, clf_reg.predict(X_t))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return del_n, miar, str(timedelta(seconds=(time.time()-start_time)))
@@ -616,9 +616,9 @@ def PD_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): 
         y_v = y_t.copy()
 
     if if_clf:
-        in_acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        in_acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        in_error = mean_squared_error(y_v, clf_reg.predict(X_v))
+        in_error = mean_squared_error(y_t, clf_reg.predict(X_t))
 
     l_c = clf_reg.layers_count
     num_of_hidden_neurons = np.sum(clf_reg.hidden)
@@ -651,7 +651,7 @@ def PD_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): 
         clf_reg.intercepts_[tmp-1] = np.delete(clf_reg.intercepts_[tmp-1], ind, 0)
 
         if if_clf:
-            acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+            acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
             if acc > in_acc: #dokładność wzrosła, od teraz maksymalna utrata dokłądności liczona względem wyższej dokładności
                 in_acc = acc
             elif acc < in_acc*(1-lost):
@@ -659,7 +659,7 @@ def PD_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): 
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         else:
-            error = mean_squared_error(y_v, clf_reg.predict(X_v))
+            error = mean_squared_error(y_t, clf_reg.predict(X_t))
             if error < in_error: #błąd zmalał, od teraz maksymalny wzrost błędu liczony względem mniejszego błędu
                 in_error = error
             elif error > in_error*(1+lost):
@@ -669,9 +669,9 @@ def PD_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): 
         clf_reg.hidden[tmp-1] -= 1 #aktualizacja liczby neuronów w warstwie ukrytej, z której nauron jest usuwany
         del_n += 1
     if if_clf:
-        miar = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        miar = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+        miar = mean_squared_error(y_t, clf_reg.predict(X_t))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return del_n, miar, str(timedelta(seconds=(time.time()-start_time)))
@@ -688,9 +688,9 @@ def PEB_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20):
         y_v = y_t.copy()
 
     if if_clf:
-        in_acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        in_acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        in_error = mean_squared_error(y_v, clf_reg.predict(X_v))
+        in_error = mean_squared_error(y_t, clf_reg.predict(X_t))
 
     l_c = clf_reg.layers_count
     num_of_hidden_neurons = np.sum(clf_reg.hidden)
@@ -723,7 +723,7 @@ def PEB_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20):
         clf_reg.intercepts_[tmp-1] = np.delete(clf_reg.intercepts_[tmp-1], ind, 0)
 
         if if_clf:
-            acc = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+            acc = f1_score(y_t, clf_reg.predict(X_t), average='macro')
             if acc > in_acc: #dokładność wzrosła, od teraz maksymalna utrata dokłądności liczona względem wyższej dokładności
                 in_acc = acc
             elif acc < in_acc*(1-lost):
@@ -731,7 +731,7 @@ def PEB_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20):
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         else:
-            error = mean_squared_error(y_v, clf_reg.predict(X_v))
+            error = mean_squared_error(y_t, clf_reg.predict(X_t))
             if error < in_error: #błąd zmalał, od teraz maksymalny wzrost błędu liczony względem mniejszego błędu
                 in_error = error
             elif error > in_error*(1+lost):
@@ -741,9 +741,9 @@ def PEB_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20):
         clf_reg.hidden[tmp-1] -= 1 #aktualizacja liczby neuronów w warstwie ukrytej, z której nauron jest usuwany
         del_n += 1
     if if_clf:
-        miar = f1_score(y_v, clf_reg.predict(X_v), average='macro')
+        miar = f1_score(y_t, clf_reg.predict(X_t), average='macro')
     else:
-        miar = mean_squared_error(y_v, clf_reg.predict(X_v))
+        miar = mean_squared_error(y_t, clf_reg.predict(X_t))
     if refit:
         clf_reg.refit(X_t, y_t, X_v, y_v, ep)
     return del_n, miar, str(timedelta(seconds=(time.time()-start_time)))
