@@ -32,7 +32,7 @@ def unpickle_all(fname):
 
 
 #PRZYGOTOWANIE DANYCH - normalizacja; podział zbioru na train, test i validation w stosunku (0.6, 0.3, 0.1)
-#rice
+#rice - klasyfikacja
 #data = pd.read_csv(RAW_DATA_FOLDER+"riceClassification.csv")
 #X = normalize(data.iloc[:,1:-1].values, norm="max", axis=0)
 #Y = data.iloc[:,-1].values
@@ -40,7 +40,7 @@ def unpickle_all(fname):
 #X_test, X_val, y_test, y_val = train_test_split(X_test_val, y_test_val, test_size=0.25)
 #pickle_all(DATA_FOLDER+"rice_data.bin", [X_train, X_test, X_val, y_train, y_test, y_val])
 
-#anuran
+#anuran - klasyfikacja
 #data = pd.read_csv(RAW_DATA_FOLDER+"Frogs_MFCCs.csv")
 #X = normalize(data.iloc[:,:-4].values, norm="max", axis=0)
 #Y = data.iloc[:,-4:-1].values
@@ -50,7 +50,7 @@ def unpickle_all(fname):
 #pickle_all(DATA_FOLDER+"anuran_genus_data.bin", [X_train, X_test, X_val, y_train[:,1], y_test[:,1], y_val[:,1]])
 #pickle_all(DATA_FOLDER+"anuran_species_data.bin", [X_train, X_test, X_val, y_train[:,2], y_test[:,2], y_val[:,2]])
 
-#Dry_Bean
+#Dry_Bean - klasyfikacja
 #data = pd.read_excel(RAW_DATA_FOLDER+"Dry_Bean_Dataset.xlsx")
 #X = normalize(data.iloc[:,:-1].values, norm="max", axis=0)
 #Y = data.iloc[:,-1].values
@@ -58,6 +58,13 @@ def unpickle_all(fname):
 #X_test, X_val, y_test, y_val = train_test_split(X_test_val, y_test_val, test_size=0.25)
 #pickle_all(DATA_FOLDER+"dry_bean_data.bin", [X_train, X_test, X_val, y_train, y_test, y_val])
 
+#Electrical_Grid - regresja
+#data = pd.read_csv(RAW_DATA_FOLDER+"Electrical_Grid.csv")
+#X = normalize(data.iloc[:,:-2].values, norm="max", axis=0)
+#Y = data.iloc[:,-2].values
+#X_train, X_test_val, y_train, y_test_val = train_test_split(X, Y, train_size=0.6)
+#X_test, X_val, y_test, y_val = train_test_split(X_test_val, y_test_val, test_size=0.25)
+#pickle_all(DATA_FOLDER+"electrical_grid_data.bin", [X_train, X_test, X_val, y_train, y_test, y_val])
 
    
 
