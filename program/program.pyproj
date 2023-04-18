@@ -34,7 +34,17 @@
     <Folder Include="results\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="data\anuran_family_data.bin" />
+    <Content Include="data\anuran_genus_data.bin" />
+    <Content Include="data\anuran_species_data.bin" />
+    <Content Include="data\dry_bean_data.bin" />
+    <Content Include="data\electrical_grid_data.bin" />
+    <Content Include="data\GT_compressor_data.bin" />
+    <Content Include="data\GT_turbine_data.bin" />
     <Content Include="data\iris_data.bin" />
+    <Content Include="data\parkinson_motor_data.bin" />
+    <Content Include="data\parkinson_total_data.bin" />
+    <Content Include="data\rice_data.bin" />
     <Content Include="networks\iris.bin" />
     <Content Include="raw_data\Dry_Bean_Dataset.xlsx" />
     <Content Include="raw_data\Electrical_Grid.csv" />
