@@ -75,6 +75,16 @@ def unpickle_all(fname):
 #pickle_all(DATA_FOLDER+"parkinson_motor_data.bin", [X_train, X_test, X_val, y_train[:,0], y_test[:,0], y_val[:,0]])
 #pickle_all(DATA_FOLDER+"parkinson_total_data.bin", [X_train, X_test, X_val, y_train[:,1], y_test[:,1], y_val[:,1]])
 
+#Gas_Turbine
+data = np.loadtxt(RAW_DATA_FOLDER+"propulsion_plants.txt")
+X = normalize(data[:,:-2], norm="max", axis=0)
+Y = data[:,-2:]
+X_train, X_test_val, y_train, y_test_val = train_test_split(X, Y, train_size=0.6)
+X_test, X_val, y_test, y_val = train_test_split(X_test_val, y_test_val, test_size=0.25)
+pickle_all(DATA_FOLDER+"GT_compressor_data.bin", [X_train, X_test, X_val, y_train[:,0], y_test[:,0], y_val[:,0]])
+pickle_all(DATA_FOLDER+"GT_turbine_data.bin", [X_train, X_test, X_val, y_train[:,1], y_test[:,1], y_val[:,1]])
+
+
    
 
 #test działania
