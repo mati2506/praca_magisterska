@@ -1,5 +1,5 @@
 ﻿import numpy as np
-from sklearn.metrics import mean_squared_error, accuracy_score
+from sklearn.metrics import mean_squared_error, f1_score
 import copy
 
 class Classifier:
@@ -114,7 +114,7 @@ class Classifier:
                     if np.all(coef != init_coefs[i]):
                         self.karnin_s[i] += ((coef-last_coefs[i])**2)*(coef/(self.eta*(coef-init_coefs[i])))
 
-            if accuracy_score(Y_val, self.predict(X_val)) == 1:
+            if f1_score(Y_val, self.predict(X_val), average='macro') == 1:
                 print(f"Uczenie zakończone po {epoch+1} epokach. Osiągnięto dopasowanie.")
                 break
     
@@ -172,7 +172,7 @@ class Classifier:
                 self.intercepts_[0] -= self.eta*delta
                 self.coefs_[0] -= self.eta*gradient
 
-            if accuracy_score(Y_val, self.predict(X_val)) == 1:
+            if f1_score(Y_val, self.predict(X_val), average='macro') == 1:
                 break
     
     def get_number_of_parametrs(self):

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import copy
 from matplotlib.colors import ListedColormap
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, mean_squared_error, accuracy_score
+from sklearn.metrics import confusion_matrix, mean_squared_error, accuracy_score, f1_score
 import myMLP
 import myNetworkPruning as prune
 import pickle
@@ -50,8 +50,8 @@ def unpickle_all(fname):
 
 #print(clf.coefs_)
 print("Sieć bez przycięcia:")
-print("Dokładność train: ", accuracy_score(y_train, clf.predict(X_train)))
-print("Dokładność test: ", accuracy_score(y_test, clf.predict(X_test)))
+print("F1 train: ", f1_score(y_train, clf.predict(X_train), average='macro'))
+print("F1 test: ", f1_score(y_test, clf.predict(X_test), average='macro'))
 print()
 
 ll = 0.05
@@ -60,13 +60,13 @@ print("simple_pruning:")
 clf1 = copy.deepcopy(clf)
 a, d1, t1 = prune.simple_pruning(clf1, ll, X_train, y_train)
 print("[Przycięte wagi, neurony]: ", a)
-print("Dokładność przed douczaniem", d1)
+print("F1 przed douczaniem", d1)
 print("Czas przycinania: ", t1)
 #print(clf1.coefs_)
 print("Architektura po przycinaniu:", clf1.hidden)
 
-print("Dokładność train: ", accuracy_score(y_train, clf1.predict(X_train)))
-print("Dokładność test: ", accuracy_score(y_test, clf1.predict(X_test)))
+print("F1 train: ", f1_score(y_train, clf1.predict(X_train), average='macro'))
+print("F1 test: ", f1_score(y_test, clf1.predict(X_test), average='macro'))
 print()
 
 
@@ -74,13 +74,13 @@ print("simple_pruning_amendment:")
 clf2 = copy.deepcopy(clf)
 b, d2, t2 = prune.simple_pruning_amendment(clf2, ll, X_train, y_train)
 print("[Przycięte wagi, neurony]: ", b)
-print("Dokładność przed douczaniem", d2)
+print("F1 przed douczaniem", d2)
 print("Czas przycinania: ", t2)
 #print(clf2.coefs_)
 print("Architektura po przycinaniu:", clf2.hidden)
 
-print("Dokładność train: ", accuracy_score(y_train, clf2.predict(X_train)))
-print("Dokładność test: ", accuracy_score(y_test, clf2.predict(X_test)))
+print("F1 train: ", f1_score(y_train, clf2.predict(X_train), average='macro'))
+print("F1 test: ", f1_score(y_test, clf2.predict(X_test), average='macro'))
 print()
 
 
@@ -88,13 +88,13 @@ print("karnin_pruning:")
 clf3 = copy.deepcopy(clf)
 c, d3, t3 = prune.karnin_pruning(clf3, ll, X_train, y_train)
 print("[Przycięte wagi, neurony]: ", c)
-print("Dokładność przed douczaniem", d3)
+print("F1 przed douczaniem", d3)
 print("Czas przycinania: ", t3)
 #print(clf3.coefs_)
 print("Architektura po przycinaniu:", clf3.hidden)
 
-print("Dokładność train: ", accuracy_score(y_train, clf3.predict(X_train)))
-print("Dokładność test: ", accuracy_score(y_test, clf3.predict(X_test)))
+print("F1 train: ", f1_score(y_train, clf3.predict(X_train), average='macro'))
+print("F1 test: ", f1_score(y_test, clf3.predict(X_test), average='macro'))
 print()
 
 
@@ -102,13 +102,13 @@ print("pruning_by_variance:")
 clf4 = copy.deepcopy(clf)
 d, d4, t4 = prune.pruning_by_variance(clf4, ll, X_train, y_train)
 print("[Przycięte wagi, neurony]: ", d)
-print("Dokładność przed douczaniem", d4)
+print("F1 przed douczaniem", d4)
 print("Czas przycinania: ", t4)
 #print(clf4.coefs_)
 print("Architektura po przycinaniu:", clf4.hidden)
 
-print("Dokładność train: ", accuracy_score(y_train, clf4.predict(X_train)))
-print("Dokładność test: ", accuracy_score(y_test, clf4.predict(X_test)))
+print("F1 train: ", f1_score(y_train, clf4.predict(X_train), average='macro'))
+print("F1 test: ", f1_score(y_test, clf4.predict(X_test), average='macro'))
 print()
 
 
@@ -116,13 +116,13 @@ print("FBI_pruning:")
 clf5 = copy.deepcopy(clf)
 e, d5, t5 = prune.FBI_pruning(clf5, ll, X_train, y_train)
 print("Przycięte neurony:", e)
-print("Dokładność przed douczaniem", d5)
+print("F1 przed douczaniem", d5)
 print("Czas przycinania: ", t5)
 #print(clf5.coefs_)
 print("Architektura po przycinaniu:", clf5.hidden)
 
-print("Dokładność train: ", accuracy_score(y_train, clf5.predict(X_train)))
-print("Dokładność test: ", accuracy_score(y_test, clf5.predict(X_test)))
+print("F1 train: ", f1_score(y_train, clf5.predict(X_train), average='macro'))
+print("F1 test: ", f1_score(y_test, clf5.predict(X_test), average='macro'))
 print()
 
 
@@ -130,13 +130,13 @@ print("APERT_pruning:")
 clf6 = copy.deepcopy(clf)
 f, d6, t6 = prune.APERT_pruning(clf6, ll, X_train, y_train)
 print("Przycięte neurony:", f)
-print("Dokładność przed douczaniem", d6)
+print("F1 przed douczaniem", d6)
 print("Czas przycinania: ", t6)
 #print(clf6.coefs_)
 print("Architektura po przycinaniu:", clf6.hidden)
 
-print("Dokładność train: ", accuracy_score(y_train, clf6.predict(X_train)))
-print("Dokładność test: ", accuracy_score(y_test, clf6.predict(X_test)))
+print("F1 train: ", f1_score(y_train, clf6.predict(X_train), average='macro'))
+print("F1 test: ", f1_score(y_test, clf6.predict(X_test), average='macro'))
 print()
 
 
@@ -144,13 +144,13 @@ print("APERTP_pruning:")
 clf7 = copy.deepcopy(clf)
 g, d7, t7 = prune.APERTP_pruning(clf7, ll, X_train, y_train)
 print("Przycięte neurony:", g)
-print("Dokładność przed douczaniem", d7)
+print("F1 przed douczaniem", d7)
 print("Czas przycinania: ", t7)
 #print(clf7.coefs_)
 print("Architektura po przycinaniu:", clf7.hidden)
 
-print("Dokładność train: ", accuracy_score(y_train, clf7.predict(X_train)))
-print("Dokładność test: ", accuracy_score(y_test, clf7.predict(X_test)))
+print("F1 train: ", f1_score(y_train, clf7.predict(X_train), average='macro'))
+print("F1 test: ", f1_score(y_test, clf7.predict(X_test), average='macro'))
 print()
 
 
@@ -158,13 +158,13 @@ print("PD_pruning:")
 clf8 = copy.deepcopy(clf)
 h, d8, t8 = prune.PD_pruning(clf8, ll, X_train, y_train)
 print("Przycięte neurony:", h)
-print("Dokładność przed douczaniem", d8)
+print("F1 przed douczaniem", d8)
 print("Czas przycinania: ", t8)
 #print(clf8.coefs_)
 print("Architektura po przycinaniu:", clf8.hidden)
 
-print("Dokładność train: ", accuracy_score(y_train, clf8.predict(X_train)))
-print("Dokładność test: ", accuracy_score(y_test, clf8.predict(X_test)))
+print("F1 train: ", f1_score(y_train, clf8.predict(X_train), average='macro'))
+print("F1 test: ", f1_score(y_test, clf8.predict(X_test), average='macro'))
 print()
 
 
@@ -172,13 +172,13 @@ print("PEB_pruning:")
 clf9 = copy.deepcopy(clf)
 i, d9, t9 = prune.PEB_pruning(clf9, ll, X_train, y_train)
 print("Przycięte neurony:", i)
-print("Dokładność przed douczaniem", d9)
+print("F1 przed douczaniem", d9)
 print("Czas przycinania: ", t9)
 #print(clf9.coefs_)
 print("Architektura po przycinaniu:", clf9.hidden)
 
-print("Dokładność train: ", accuracy_score(y_train, clf9.predict(X_train)))
-print("Dokładność test: ", accuracy_score(y_test, clf9.predict(X_test)))
+print("F1 train: ", f1_score(y_train, clf9.predict(X_train), average='macro'))
+print("F1 test: ", f1_score(y_test, clf9.predict(X_test), average='macro'))
 print()
 
 
