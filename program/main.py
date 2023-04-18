@@ -66,6 +66,15 @@ def unpickle_all(fname):
 #X_test, X_val, y_test, y_val = train_test_split(X_test_val, y_test_val, test_size=0.25)
 #pickle_all(DATA_FOLDER+"electrical_grid_data.bin", [X_train, X_test, X_val, y_train, y_test, y_val])
 
+#Parkinsons_Telemonitoring
+#data = pd.read_csv(RAW_DATA_FOLDER+"parkinsons_updrs.data")
+#X = normalize(data.iloc[:,6:].values, norm="max", axis=0)
+#Y = data.iloc[:,4:6].values
+#X_train, X_test_val, y_train, y_test_val = train_test_split(X, Y, train_size=0.6)
+#X_test, X_val, y_test, y_val = train_test_split(X_test_val, y_test_val, test_size=0.25)
+#pickle_all(DATA_FOLDER+"parkinson_motor_data.bin", [X_train, X_test, X_val, y_train[:,0], y_test[:,0], y_val[:,0]])
+#pickle_all(DATA_FOLDER+"parkinson_total_data.bin", [X_train, X_test, X_val, y_train[:,1], y_test[:,1], y_val[:,1]])
+
    
 
 #test działania
