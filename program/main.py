@@ -99,6 +99,7 @@ network_number = 0 #numer architektury sieci, dla której będzie aktualne uruch
 
 
 #PRZYGOTOWANIE SIECI
+#Dla klasyfikacji
 for hidden in networks_neurons:
     clf = myMLP.Classifier(hidden=hidden, epochs=500)
     t1 = time.time()
@@ -109,15 +110,32 @@ for hidden in networks_neurons:
     f1_val = f1_score(y_val, clf.predict(X_val), average='macro')
     l_n = str(hidden) if type(hidden) == int else '-'.join(np.array(hidden, dtype=str))
     f = open("nauczone_sieci.txt", 'a')
-    f.write(f"{data[data_number]}_network_{l_n}: {t_t}s  f1_train: {f1_train}  f1_test: {f1_test}  f1_validation: {f1_val} \n")
+    f.write(f"{data[data_number]}_network_{l_n}: {t_t}  f1_train: {f1_train}  f1_test: {f1_test}  f1_validation: {f1_val} \n")
     f.close()
     pickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin", [clf])    
     print(t_t)
+
+#Dla regresji
+#for hidden in networks_neurons:
+#    reg = myMLP.Regressor(hidden=hidden, epochs=500)
+#    t1 = time.time()
+#    reg.fit(X_train, y_train, X_val, y_val)
+#    t_t = str(timedelta(seconds=(time.time()-t1)))
+#    MSE_train = mean_squared_error(y_train, reg.predict(X_train), average='macro')
+#    MSE_test = mean_squared_error(y_test, reg.predict(X_test), average='macro')
+#    MSE_val = mean_squared_error(y_val, reg.predict(X_val), average='macro')
+#    l_n = str(hidden) if type(hidden) == int else '-'.join(np.array(hidden, dtype=str))
+#    f = open("nauczone_sieci.txt", 'a')
+#    f.write(f"{data[data_number]}_network_{l_n}: {t_t}s  MSE_train: {MSE_train}  MSE_test: {MSE_test}  MSE_validation: {MSE_val} \n")
+#    f.close()
+#    pickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin", [reg])    
+#    print(t_t)
 
 
 #ODCZYT SIECI Z PLIKU .BIN
 #l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_number]) == int else '-'.join(np.array(networks_neurons[network_number], dtype=str))
 #[clf] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
+#[reg] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
 
 
    
