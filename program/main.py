@@ -88,7 +88,7 @@ def unpickle_all(fname):
 data = ["rice", "anuran_family", "anuran_genus", "anuran_species", "dry_bean",
         "electrical_grid", "parkinson_motor", "parkinson_total", "GT_compressor", "GT_turbine"] #nazwy plików zbiorów danych
 
-data_number = 0 #numer danych, na których będzie aktualne uruchomienie programu
+data_number = 1 #numer danych, na których będzie aktualne uruchomienie programu
 
 
 #ODCZYT DANYCH Z PLIKU .BIN
@@ -96,8 +96,13 @@ data_number = 0 #numer danych, na których będzie aktualne uruchomienie program
 
 
 #PRZYGOTOWANIE SIECI
-clf = myMLP.Classifier(epochs=100)
+#clf = myMLP.Classifier(epochs=100)
+#t1 = time.time()
+#clf.fit(X_train, y_train, X_val, y_val)
+#print(time.time()-t1)
+#pickle_all(NETWORK_FOLDER+"test.bin", [clf])
 
+[clf] = unpickle_all(NETWORK_FOLDER+"test.bin")
 
    
 
@@ -128,7 +133,7 @@ clf = myMLP.Classifier(epochs=100)
 
 #print("simple_pruning:")
 #clf1 = copy.deepcopy(clf)
-#a, d1, t1 = prune.simple_pruning(clf1, ll, X_train, y_train, X_v=X_val, y_v=y_val)
+#a, d1, t1 = prune.simple_pruning(clf1, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("[Przycięte wagi, neurony]: ", a)
 #print("F1 przed douczaniem", d1)
 #print("Czas przycinania: ", t1)
@@ -143,7 +148,7 @@ clf = myMLP.Classifier(epochs=100)
 
 #print("simple_pruning_amendment:")
 #clf2 = copy.deepcopy(clf)
-#b, d2, t2 = prune.simple_pruning_amendment(clf2, ll, X_train, y_train, X_v=X_val, y_v=y_val)
+#b, d2, t2 = prune.simple_pruning_amendment(clf2, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("[Przycięte wagi, neurony]: ", b)
 #print("F1 przed douczaniem", d2)
 #print("Czas przycinania: ", t2)
@@ -158,7 +163,7 @@ clf = myMLP.Classifier(epochs=100)
 
 #print("karnin_pruning:")
 #clf3 = copy.deepcopy(clf)
-#c, d3, t3 = prune.karnin_pruning(clf3, ll, X_train, y_train, X_v=X_val, y_v=y_val)
+#c, d3, t3 = prune.karnin_pruning(clf3, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("[Przycięte wagi, neurony]: ", c)
 #print("F1 przed douczaniem", d3)
 #print("Czas przycinania: ", t3)
@@ -173,7 +178,7 @@ clf = myMLP.Classifier(epochs=100)
 
 #print("pruning_by_variance:")
 #clf4 = copy.deepcopy(clf)
-#d, d4, t4 = prune.pruning_by_variance(clf4, ll, X_train, y_train, X_v=X_val, y_v=y_val)
+#d, d4, t4 = prune.pruning_by_variance(clf4, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("[Przycięte wagi, neurony]: ", d)
 #print("F1 przed douczaniem", d4)
 #print("Czas przycinania: ", t4)
@@ -188,7 +193,7 @@ clf = myMLP.Classifier(epochs=100)
 
 #print("FBI_pruning:")
 #clf5 = copy.deepcopy(clf)
-#e, d5, t5 = prune.FBI_pruning(clf5, ll, X_train, y_train, X_v=X_val, y_v=y_val)
+#e, d5, t5 = prune.FBI_pruning(clf5, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("Przycięte neurony:", e)
 #print("F1 przed douczaniem", d5)
 #print("Czas przycinania: ", t5)
@@ -203,7 +208,7 @@ clf = myMLP.Classifier(epochs=100)
 
 #print("APERT_pruning:")
 #clf6 = copy.deepcopy(clf)
-#f, d6, t6 = prune.APERT_pruning(clf6, ll, X_train, y_train, X_v=X_val, y_v=y_val)
+#f, d6, t6 = prune.APERT_pruning(clf6, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("Przycięte neurony:", f)
 #print("F1 przed douczaniem", d6)
 #print("Czas przycinania: ", t6)
@@ -218,7 +223,7 @@ clf = myMLP.Classifier(epochs=100)
 
 #print("APERTP_pruning:")
 #clf7 = copy.deepcopy(clf)
-#g, d7, t7 = prune.APERTP_pruning(clf7, ll, X_train, y_train, X_v=X_val, y_v=y_val)
+#g, d7, t7 = prune.APERTP_pruning(clf7, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("Przycięte neurony:", g)
 #print("F1 przed douczaniem", d7)
 #print("Czas przycinania: ", t7)
@@ -233,7 +238,7 @@ clf = myMLP.Classifier(epochs=100)
 
 #print("PD_pruning:")
 #clf8 = copy.deepcopy(clf)
-#h, d8, t8 = prune.PD_pruning(clf8, ll, X_train, y_train, X_v=X_val, y_v=y_val)
+#h, d8, t8 = prune.PD_pruning(clf8, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("Przycięte neurony:", h)
 #print("F1 przed douczaniem", d8)
 #print("Czas przycinania: ", t8)
@@ -248,7 +253,7 @@ clf = myMLP.Classifier(epochs=100)
 
 #print("PEB_pruning:")
 #clf9 = copy.deepcopy(clf)
-#i, d9, t9 = prune.PEB_pruning(clf9, ll, X_train, y_train, X_v=X_val, y_v=y_val)
+#i, d9, t9 = prune.PEB_pruning(clf9, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("Przycięte neurony:", i)
 #print("F1 przed douczaniem", d9)
 #print("Czas przycinania: ", t9)
