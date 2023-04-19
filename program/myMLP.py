@@ -3,7 +3,7 @@ from sklearn.metrics import mean_squared_error, f1_score
 import copy
 
 class Classifier:
-    def __init__(self, hidden=(10,10,10), epochs=250, eta=0.1, activation = "relu", shuffle=True, part=None, calc_s=True):
+    def __init__(self, hidden=(10,10,10), epochs=250, eta=0.1, activation = "sigmoid", shuffle=True, part=None, calc_s=True):
         self.hidden = [hidden] if type(hidden)==int else list(hidden)    #Liczba neuronów na kolejnych warstwach ukrytych
         self.layers_count = 2 if type(hidden)==int else len(hidden)+1 #Liczba warstw (ukrytych + wyjściowa)
         self.epochs = epochs    #Liczba epok
@@ -192,7 +192,7 @@ class Classifier:
 
 
 class Regressor:
-    def __init__(self, hidden=(10,10,10), epochs=250, eta=0.1, activation = "relu", shuffle=True, part=None, calc_s=True):
+    def __init__(self, hidden=(10,10,10), epochs=250, eta=0.1, activation = "sigmoid", shuffle=True, part=None, calc_s=True):
         self.hidden = [hidden] if type(hidden)==int else list(hidden)    #Liczba neuronów na kolejnych warstwach ukrytych
         self.layers_count = 2 if type(hidden)==int else len(hidden)+1 #Liczba warstw (ukrytych + wyjściowa)
         self.epochs = epochs    #Liczba epok

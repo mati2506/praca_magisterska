@@ -96,7 +96,7 @@ data_number = 0 #numer danych, na których będzie aktualne uruchomienie program
 
 
 #PRZYGOTOWANIE SIECI
-#...
+clf = myMLP.Classifier(epochs=100)
 
 
    
