@@ -297,7 +297,7 @@ class Regressor:
                 break
     
     def predict(self, X):
-        return np.array([self._forward(x)[-1] for x in X])
+        return np.array([self._forward(x)[-1] for x in X])[:,0]
 
     def refit(self, X, Y, X_val, Y_val, ep):
         samples = X.shape[0]
