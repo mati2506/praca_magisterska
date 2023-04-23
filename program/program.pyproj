@@ -50,6 +50,7 @@
     <Content Include="networks\anuran_family_network_30.bin" />
     <Content Include="networks\anuran_genus_network_16-13-10.bin" />
     <Content Include="networks\anuran_genus_network_18-15.bin" />
+    <Content Include="networks\anuran_genus_network_18-15_v1.bin" />
     <Content Include="networks\anuran_genus_network_30.bin" />
     <Content Include="networks\anuran_species_network_16-13-10.bin" />
     <Content Include="networks\anuran_species_network_18-15.bin" />
