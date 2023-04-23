@@ -137,7 +137,13 @@ for hidden in networks_neurons:
 #[clf] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
 #[reg] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
 
-
+#CO ZBIERAĆ Z TESTÓW:
+#poziom zakładanej utraty f1 (np. 0%, 2.5%, 5%, 7.5%, 10%) lub wzrostu MSE (np. 0%, 50%, 100%, 200%, 500%)
+#czas przycinania
+#wartości f1/dokładności/macierz_konfuzji/? dla klasyfikacji; MSE/MAE/? dla regresji
+#liczba usuniętych wag/neuronów
+#czas predykcji po przycinaniu???
+#...???
    
 
 #test działania
