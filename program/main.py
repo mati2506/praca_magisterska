@@ -152,11 +152,19 @@ methods = {'SP':prune.simple_pruning, 'SPA':prune.simple_pruning_amendment, 'KP'
           'PD':prune.PD_pruning, 'PEB':prune.PEB_pruning}
 
 #dla klasyfikacji
-for met in methods:
-    for los in [0.1]:
-        clf_t = copy.deepcopy(clf)
-        dele, f1_p, t_p = methods[met](clf_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
-        print(met, dele, f1_p, t_p)
+#for met in methods:
+#    for los in [0]: #...
+#        clf_t = copy.deepcopy(clf)
+#        dele, f1_p, t_p = methods[met](clf_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
+#        print(met, dele, f1_p, t_p)
+
+
+#dla regresji
+#for met in methods:
+#    for los in [0]: #...
+#        reg_t = copy.deepcopy(reg)
+#        dele, f1_p, t_p = methods[met](reg_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
+#        print(met, dele, f1_p, t_p)
 
 
 
