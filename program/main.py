@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import copy
 from matplotlib.colors import ListedColormap
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, mean_squared_error, accuracy_score, f1_score
+from sklearn.metrics import confusion_matrix, mean_squared_error, accuracy_score, f1_score, mean_absolute_error, r2_score
 from sklearn.preprocessing import normalize
 import myMLP
 import myNetworkPruning as prune
@@ -90,7 +90,7 @@ data = ["rice", "anuran_family", "anuran_genus", "anuran_species", "dry_bean",
         "electrical_grid", "parkinson_motor", "parkinson_total", "GT_compressor", "GT_turbine"] #nazwy plików zbiorów danych
 networks_neurons = [(30), (18,15), (16,13,10)]
 
-data_number = 5 #numer danych, na których będzie aktualne uruchomienie programu
+data_number = 0 #numer danych, na których będzie aktualne uruchomienie programu
 network_number = 0 #numer architektury sieci, dla której będzie aktualne uruchomienie programu
 
 
@@ -133,8 +133,8 @@ network_number = 0 #numer architektury sieci, dla której będzie aktualne uruch
 
 
 #ODCZYT SIECI Z PLIKU .BIN
-#l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_number]) == int else '-'.join(np.array(networks_neurons[network_number], dtype=str))
-#[clf] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
+l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_number]) == int else '-'.join(np.array(networks_neurons[network_number], dtype=str))
+[clf] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
 #[reg] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
 
 #CO ZBIERAĆ Z TESTÓW:
@@ -152,19 +152,39 @@ methods = {'SP':prune.simple_pruning, 'SPA':prune.simple_pruning_amendment, 'KP'
           'PD':prune.PD_pruning, 'PEB':prune.PEB_pruning}
 
 #dla klasyfikacji
-#for met in methods:
-#    for los in [0]: #...
-#        clf_t = copy.deepcopy(clf)
-#        dele, f1_p, t_p = methods[met](clf_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
-#        print(met, dele, f1_p, t_p)
-
+for met in methods:
+    for los in [0, 0.025, 0.05, 0.075, 0.1]:
+        clf_t = copy.deepcopy(clf)
+        dele, f1_p, t_p = methods[met](clf_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
+        pickle_all(PRUNE_NET_FOLDER+f"{data[data_number]}_network_{l_n}_pruned_{met}_los_{los}", [clf_t])
+        print(met, dele, f1_p, t_p)
+        t_mean = 0 #średni czas predykcji
+        for _ in range(25):
+            t1 = time.time()
+            y_pred = clf_t.predict(X_test)
+            t_mean += (time.time()-t1)
+        t_mean = t_mean/25
+        f1_t = f1_score(y_test, y_pred)
+        acc = accuracy_score(y_test, y_pred)
+        cls_names = clf_t.class_labels_ #nazwy klas w zbiorze
+        conf_matrix = pd.DataFrame(confusion_matrix(y_test, y_pred, labels=cls_names), index=cls_names, columns=cls_names)
 
 #dla regresji
 #for met in methods:
-#    for los in [0]: #...
+#    for los in [0, 0.5, 1, 1.75, 2.5]:
 #        reg_t = copy.deepcopy(reg)
-#        dele, f1_p, t_p = methods[met](reg_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
-#        print(met, dele, f1_p, t_p)
+#        dele, MSE_p, t_p = methods[met](reg_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
+#        pickle_all(PRUNE_NET_FOLDER+f"{data[data_number]}_network_{l_n}_pruned_{met}_los_{los}", [reg_t])
+#        print(met, dele, MSE_p, t_p)
+#        t_mean = 0 #średni czas predykcji
+#        for _ in range(25):
+#            t1 = time.time()
+#            y_pred = reg_t.predict(X_test)
+#            t_mean += (time.time()-t1)
+#        t_mean = t_mean/25
+#        MSE_t = mean_squared_error(y_test, y_pred)
+#        MAE = mean_absolute_error(y_test, y_pred)
+#        R2 = r2_score(y_test, y_pred)
 
 
 
