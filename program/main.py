@@ -90,7 +90,7 @@ data = ["rice", "anuran_family", "anuran_genus", "anuran_species", "dry_bean",
         "electrical_grid", "parkinson_motor", "parkinson_total", "GT_compressor", "GT_turbine"] #nazwy plików zbiorów danych
 networks_neurons = [(30), (18,15), (16,13,10)]
 
-data_number = 9 #numer danych, na których będzie aktualne uruchomienie programu
+data_number = 5 #numer danych, na których będzie aktualne uruchomienie programu
 network_number = 0 #numer architektury sieci, dla której będzie aktualne uruchomienie programu
 
 
@@ -116,20 +116,20 @@ network_number = 0 #numer architektury sieci, dla której będzie aktualne uruch
 #    print(t_t)
 
 #Dla regresji
-for hidden in networks_neurons:
-    reg = myMLP.Regressor(hidden=hidden, epochs=500)
-    t1 = time.time()
-    reg.fit(X_train, y_train, X_val, y_val)
-    t_t = str(timedelta(seconds=(time.time()-t1)))
-    MSE_train = mean_squared_error(y_train, reg.predict(X_train))
-    MSE_test = mean_squared_error(y_test, reg.predict(X_test))
-    MSE_val = mean_squared_error(y_val, reg.predict(X_val))
-    l_n = str(hidden) if type(hidden) == int else '-'.join(np.array(hidden, dtype=str))
-    f = open("nauczone_sieci.txt", 'a')
-    f.write(f"{data[data_number]}_network_{l_n}: {t_t}  MSE_train: {MSE_train}  MSE_test: {MSE_test}  MSE_validation: {MSE_val} \n")
-    f.close()
-    pickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin", [reg])    
-    print(t_t)
+#for hidden in networks_neurons:
+#    reg = myMLP.Regressor(hidden=hidden, epochs=500)
+#    t1 = time.time()
+#    reg.fit(X_train, y_train, X_val, y_val)
+#    t_t = str(timedelta(seconds=(time.time()-t1)))
+#    MSE_train = mean_squared_error(y_train, reg.predict(X_train))
+#    MSE_test = mean_squared_error(y_test, reg.predict(X_test))
+#    MSE_val = mean_squared_error(y_val, reg.predict(X_val))
+#    l_n = str(hidden) if type(hidden) == int else '-'.join(np.array(hidden, dtype=str))
+#    f = open("nauczone_sieci.txt", 'a')
+#    f.write(f"{data[data_number]}_network_{l_n}: {t_t}  MSE_train: {MSE_train}  MSE_test: {MSE_test}  MSE_validation: {MSE_val} \n")
+#    f.close()
+#    pickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin", [reg])    
+#    print(t_t)
 
 
 #ODCZYT SIECI Z PLIKU .BIN
@@ -138,13 +138,27 @@ for hidden in networks_neurons:
 #[reg] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
 
 #CO ZBIERAĆ Z TESTÓW:
-#poziom zakładanej utraty f1 (np. 0%, 2.5%, 5%, 7.5%, 10%) lub wzrostu MSE (np. 0%, 50%, 100%, 200%, 500%)
+#poziom zakładanej utraty f1 (np. 0%, 2.5%, 5%, 7.5%, 10%) lub wzrostu MSE (np. 0%, 50%, 100%, 175%, 250%)
 #czas przycinania
-#wartości f1/dokładności/macierz_konfuzji/? dla klasyfikacji; MSE/MAE/? dla regresji
+#wartości f1/dokładności/(może)macierz_konfuzji dla klasyfikacji; MSE/MAE/(może)R^2 dla regresji
 #liczba usuniętych wag/neuronów
 #czas predykcji po przycinaniu???
 #...???
-   
+  
+
+#BADANIA
+methods = {'SP':prune.simple_pruning, 'SPA':prune.simple_pruning_amendment, 'KP':prune.karnin_pruning,
+          'PBV':prune.pruning_by_variance, 'FBI':prune.FBI_pruning, 'APERT':prune.APERT_pruning, 'APERTP':prune.APERTP_pruning,
+          'PD':prune.PD_pruning, 'PEB':prune.PEB_pruning}
+
+#dla klasyfikacji
+for met in methods:
+    for los in [0.1]:
+        clf_t = copy.deepcopy(clf)
+        dele, f1_p, t_p = methods[met](clf_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
+        print(met, dele, f1_p, t_p)
+
+
 
 #test działania
 ##data = pd.read_csv(RAW_DATA_FOLDER+"iris.data", header=None)
@@ -169,11 +183,11 @@ for hidden in networks_neurons:
 #print("F1 validation ", f1_score(y_val, clf.predict(X_val), average='macro'))
 #print()
 
-#ll = 0.05
+#ll = 0.5
 
 #print("simple_pruning:")
-#clf1 = copy.deepcopy(clf)
-#a, d1, t1 = prune.simple_pruning(clf1, ll, X_train, y_train, X_v=X_val, y_v=y_val)
+#clf1 = copy.deepcopy(reg)
+#a, d1, t1 = prune.simple_pruning(clf1, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("[Przycięte wagi, neurony]: ", a)
 #print("F1 przed douczaniem", d1)
 #print("Czas przycinania: ", t1)
@@ -187,8 +201,8 @@ for hidden in networks_neurons:
 
 
 #print("simple_pruning_amendment:")
-#clf2 = copy.deepcopy(clf)
-#b, d2, t2 = prune.simple_pruning_amendment(clf2, ll, X_train, y_train, X_v=X_val, y_v=y_val)
+#clf2 = copy.deepcopy(reg)
+#b, d2, t2 = prune.simple_pruning_amendment(clf2, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("[Przycięte wagi, neurony]: ", b)
 #print("F1 przed douczaniem", d2)
 #print("Czas przycinania: ", t2)
@@ -202,8 +216,8 @@ for hidden in networks_neurons:
 
 
 #print("karnin_pruning:")
-#clf3 = copy.deepcopy(clf)
-#c, d3, t3 = prune.karnin_pruning(clf3, ll, X_train, y_train, X_v=X_val, y_v=y_val)
+#clf3 = copy.deepcopy(reg)
+#c, d3, t3 = prune.karnin_pruning(clf3, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("[Przycięte wagi, neurony]: ", c)
 #print("F1 przed douczaniem", d3)
 #print("Czas przycinania: ", t3)
@@ -217,8 +231,8 @@ for hidden in networks_neurons:
 
 
 #print("pruning_by_variance:")
-#clf4 = copy.deepcopy(clf)
-#d, d4, t4 = prune.pruning_by_variance(clf4, ll, X_train, y_train, X_v=X_val, y_v=y_val)
+#clf4 = copy.deepcopy(reg)
+#d, d4, t4 = prune.pruning_by_variance(clf4, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("[Przycięte wagi, neurony]: ", d)
 #print("F1 przed douczaniem", d4)
 #print("Czas przycinania: ", t4)
@@ -232,7 +246,7 @@ for hidden in networks_neurons:
 
 
 #print("FBI_pruning:")
-#clf5 = copy.deepcopy(clf)
+#clf5 = copy.deepcopy(reg)
 #e, d5, t5 = prune.FBI_pruning(clf5, ll, X_train, y_train, X_v=X_val, y_v=y_val)
 #print("Przycięte neurony:", e)
 #print("F1 przed douczaniem", d5)
@@ -247,7 +261,7 @@ for hidden in networks_neurons:
 
 
 #print("APERT_pruning:")
-#clf6 = copy.deepcopy(clf)
+#clf6 = copy.deepcopy(reg)
 #f, d6, t6 = prune.APERT_pruning(clf6, ll, X_train, y_train, X_v=X_val, y_v=y_val)
 #print("Przycięte neurony:", f)
 #print("F1 przed douczaniem", d6)
@@ -262,7 +276,7 @@ for hidden in networks_neurons:
 
 
 #print("APERTP_pruning:")
-#clf7 = copy.deepcopy(clf)
+#clf7 = copy.deepcopy(reg)
 #g, d7, t7 = prune.APERTP_pruning(clf7, ll, X_train, y_train, X_v=X_val, y_v=y_val)
 #print("Przycięte neurony:", g)
 #print("F1 przed douczaniem", d7)
@@ -277,7 +291,7 @@ for hidden in networks_neurons:
 
 
 #print("PD_pruning:")
-#clf8 = copy.deepcopy(clf)
+#clf8 = copy.deepcopy(reg)
 #h, d8, t8 = prune.PD_pruning(clf8, ll, X_train, y_train, X_v=X_val, y_v=y_val)
 #print("Przycięte neurony:", h)
 #print("F1 przed douczaniem", d8)
@@ -292,7 +306,7 @@ for hidden in networks_neurons:
 
 
 #print("PEB_pruning:")
-#clf9 = copy.deepcopy(clf)
+#clf9 = copy.deepcopy(reg)
 #i, d9, t9 = prune.PEB_pruning(clf9, ll, X_train, y_train, X_v=X_val, y_v=y_val)
 #print("Przycięte neurony:", i)
 #print("F1 przed douczaniem", d9)

@@ -28,9 +28,9 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
 
     tmp_w = copy.deepcopy(clf_reg.coefs_)
 
-    for i in range(l_c):
-        tmp_w[i][tmp_w[i] == 0] = np.nan
+    for i in range(l_c):       
         del_w += np.sum(tmp_w[i] == 0)
+        tmp_w[i][tmp_w[i] == 0] = np.nan
 
     tmp_ind = [None]*l_c
     tmp_val = [None]*l_c
@@ -115,9 +115,9 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
     tmp_w = copy.deepcopy(clf_reg.coefs_)
     c_r_clc = copy.deepcopy(clf_reg)
 
-    for i in range(l_c):
-        tmp_w[i][tmp_w[i] == 0] = np.nan
+    for i in range(l_c):      
         del_w += np.sum(tmp_w[i] == 0)
+        tmp_w[i][tmp_w[i] == 0] = np.nan
 
     tmp_ind = [None]*l_c
     tmp_val = [None]*l_c
