@@ -101,7 +101,7 @@ class Classifier:
                 if self.activ == "relu":
                     deri = (activation[0]>0)*1
                 else:
-                    deri = activation[0]*(1 - activation[j])
+                    deri = activation[0]*(1 - activation[0])
                 delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
@@ -164,7 +164,7 @@ class Classifier:
                 if self.activ == "relu":
                     deri = (activation[0]>0)*1
                 else:
-                    deri = activation[0]*(1 - activation[j])
+                    deri = activation[0]*(1 - activation[0])
                 delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
@@ -279,7 +279,7 @@ class Regressor:
                 if self.activ == "relu":
                     deri = (activation[0]>0)*1
                 else:
-                    deri = activation[0]*(1 - activation[j])
+                    deri = activation[0]*(1 - activation[0])
                 delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
@@ -332,7 +332,7 @@ class Regressor:
                 if self.activ == "relu":
                     deri = (activation[0]>0)*1
                 else:
-                    deri = activation[0]*(1 - activation[j])
+                    deri = activation[0]*(1 - activation[0])
                 delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
