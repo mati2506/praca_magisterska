@@ -45,6 +45,8 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
             else:
                 tmp_ind[i] = np.unravel_index(np.nanargmin(np.abs(tmp_w[i])),shape=tmp_w[i].shape)
                 tmp_val[i] = tmp_w[i][tmp_ind[i]]
+        if np.all(np.isnan(tmp_val)):
+            break
         tmp = np.nanargmin(np.abs(np.array(tmp_val)))
         tmp_w[tmp][tmp_ind[tmp]] = np.nan
         clf_reg.coefs_[tmp][tmp_ind[tmp]] = 0
@@ -133,6 +135,8 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
             else:
                 tmp_ind[i] = np.unravel_index(np.nanargmin(np.abs(tmp_w[i])),shape=tmp_w[i].shape)
                 tmp_val[i] = tmp_w[i][tmp_ind[i]]
+        if np.all(np.isnan(tmp_val)):
+            break
         tmp = np.nanargmin(np.abs(np.array(tmp_val)))
         tmp_w[tmp][tmp_ind[tmp]] = np.nan
         ind_w = list(tmp_ind[tmp])
@@ -222,6 +226,8 @@ def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
             else:
                 tmp_ind[i] = np.unravel_index(np.nanargmin(np.abs(s[i])),shape=s[i].shape)
                 tmp_val[i] = s[i][tmp_ind[i]]
+        if np.all(np.isnan(tmp_val)):
+            break
         tmp = np.nanargmin(np.abs(np.array(tmp_val)))
         s[tmp][tmp_ind[tmp]] = np.nan
         ind_w = list(tmp_ind[tmp])
@@ -309,6 +315,8 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
             else:
                 tmp_ind[i] = np.unravel_index(np.nanargmin(np.abs(tmp_var[i])),shape=tmp_var[i].shape)
                 tmp_val[i] = tmp_var[i][tmp_ind[i]]
+        if np.all(np.isnan(tmp_val)):
+            break
         tmp = np.nanargmin(np.abs(np.array(tmp_val)))
         tmp_var[tmp][tmp_ind[tmp]] = np.nan
         clf_reg.intercepts_[tmp][tmp_ind[tmp][1]] += tmp_mean[tmp][tmp_ind[tmp]]
