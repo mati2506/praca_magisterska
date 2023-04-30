@@ -90,7 +90,7 @@ data = ["rice", "anuran_family", "anuran_genus", "anuran_species", "dry_bean",
         "electrical_grid", "parkinson_motor", "parkinson_total", "GT_compressor", "GT_turbine"] #nazwy plików zbiorów danych
 networks_neurons = [(30), (18,15), (16,13,10)]
 
-data_number = 1 #numer danych, na których będzie aktualne uruchomienie programu
+data_number = 0 #numer danych, na których będzie aktualne uruchomienie programu
 network_number = 0 #numer architektury sieci, dla której będzie aktualne uruchomienie programu
 
 
@@ -100,24 +100,24 @@ network_number = 0 #numer architektury sieci, dla której będzie aktualne uruch
 
 #PRZYGOTOWANIE SIECI
 #Dla klasyfikacji
-for hidden in networks_neurons:
-    clf = myMLP.Classifier(hidden=hidden, epochs=500, activation="relu")
-    t1 = time.time()
-    clf.fit(X_train, y_train, X_val, y_val)
-    t_t = str(timedelta(seconds=(time.time()-t1)))
-    f1_train = f1_score(y_train, clf.predict(X_train), average='macro')
-    f1_test = f1_score(y_test, clf.predict(X_test), average='macro')
-    f1_val = f1_score(y_val, clf.predict(X_val), average='macro')
-    l_n = str(hidden) if type(hidden) == int else '-'.join(np.array(hidden, dtype=str))
-    f = open("nauczone_sieci.txt", 'a')
-    f.write(f"{data[data_number]}_network_{l_n}: {t_t}  f1_train: {f1_train}  f1_test: {f1_test}  f1_validation: {f1_val} \n")
-    f.close()
-    pickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin", [clf])    
-    print(t_t)
+#for hidden in networks_neurons:
+#    clf = myMLP.Classifier(hidden=hidden, epochs=500) #, activation="relu")
+#    t1 = time.time()
+#    clf.fit(X_train, y_train, X_val, y_val)
+#    t_t = str(timedelta(seconds=(time.time()-t1)))
+#    f1_train = f1_score(y_train, clf.predict(X_train), average='macro')
+#    f1_test = f1_score(y_test, clf.predict(X_test), average='macro')
+#    f1_val = f1_score(y_val, clf.predict(X_val), average='macro')
+#    l_n = str(hidden) if type(hidden) == int else '-'.join(np.array(hidden, dtype=str))
+#    f = open("nauczone_sieci.txt", 'a')
+#    f.write(f"{data[data_number]}_network_{l_n}: {t_t}  f1_train: {f1_train}  f1_test: {f1_test}  f1_validation: {f1_val} \n")
+#    f.close()
+#    pickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin", [clf])    
+#    print(t_t)
 
 #Dla regresji
 #for hidden in networks_neurons:
-#    reg = myMLP.Regressor(hidden=hidden, epochs=500, activation="relu")
+#    reg = myMLP.Regressor(hidden=hidden, epochs=500) #, activation="relu")
 #    t1 = time.time()
 #    reg.fit(X_train, y_train, X_val, y_val)
 #    t_t = str(timedelta(seconds=(time.time()-t1)))
@@ -133,8 +133,8 @@ for hidden in networks_neurons:
 
 
 #ODCZYT SIECI Z PLIKU .BIN
-#l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_number]) == int else '-'.join(np.array(networks_neurons[network_number], dtype=str))
-#[clf] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
+l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_number]) == int else '-'.join(np.array(networks_neurons[network_number], dtype=str))
+[clf] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
 #[reg] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
 
 #CO ZBIERAĆ Z TESTÓW:
@@ -152,22 +152,22 @@ methods = {'SP':prune.simple_pruning, 'SPA':prune.simple_pruning_amendment, 'KP'
           'PD':prune.PD_pruning, 'PEB':prune.PEB_pruning}
 
 #dla klasyfikacji
-#for met in methods:
-#    for los in [0, 0.025, 0.05, 0.075, 0.1]:
-#        clf_t = copy.deepcopy(clf)
-#        dele, f1_p, t_p = methods[met](clf_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
-#        pickle_all(PRUNE_NET_FOLDER+f"{data[data_number]}_network_{l_n}_pruned_{met}_los_{los}", [clf_t])
-#        print(met, dele, f1_p, t_p)
-#        t_mean = 0 #średni czas predykcji
-#        for _ in range(25):
-#            t1 = time.time()
-#            y_pred = clf_t.predict(X_test)
-#            t_mean += (time.time()-t1)
-#        t_mean = t_mean/25
-#        f1_t = f1_score(y_test, y_pred)
-#        acc = accuracy_score(y_test, y_pred)
-#        cls_names = clf_t.class_labels_ #nazwy klas w zbiorze
-#        conf_matrix = pd.DataFrame(confusion_matrix(y_test, y_pred, labels=cls_names), index=cls_names, columns=cls_names)
+for met in methods:
+    for los in [0, 0.025, 0.05, 0.075, 0.1]:
+        clf_t = copy.deepcopy(clf)
+        dele, f1_p, t_p = methods[met](clf_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
+        pickle_all(PRUNE_NET_FOLDER+f"{data[data_number]}_network_{l_n}_pruned_{met}_los_{los}", [clf_t])
+        print(met, dele, f1_p, t_p)
+        t_mean = 0 #średni czas predykcji
+        for _ in range(25):
+            t1 = time.time()
+            y_pred = clf_t.predict(X_test)
+            t_mean += (time.time()-t1)
+        t_mean = t_mean/25
+        f1_t = f1_score(y_test, y_pred)
+        acc = accuracy_score(y_test, y_pred)
+        cls_names = clf_t.class_labels_ #nazwy klas w zbiorze
+        conf_matrix = pd.DataFrame(confusion_matrix(y_test, y_pred, labels=cls_names), index=cls_names, columns=cls_names)
 
 #dla regresji
 #for met in methods:
