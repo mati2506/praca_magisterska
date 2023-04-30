@@ -655,7 +655,7 @@ def PD_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20): 
                 tmp_ind[i] = 0
                 tmp_val[i] = np.nan
             else:
-                Sj = np.mean(np.sum(clf_reg.coefs_[i-1]**2, axis=0)*(activ[i-1]**2), axis=0)
+                Sj = np.mean(np.sum(clf_reg.coefs_[i]**2, axis=1)*(activ[i-1]**2), axis=0)
                 tmp_ind[i] = np.argmin(Sj)
                 tmp_val[i] = Sj[tmp_ind[i]]
 
@@ -727,7 +727,7 @@ def PEB_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, refit=True, ep=20):
                 tmp_ind[i] = 0
                 tmp_val[i] = np.nan
             else:
-                Sj = np.mean(np.abs(np.sum(clf_reg.coefs_[i-1], axis=0)*(activ[i-1])), axis=0)
+                Sj = np.mean(np.abs(np.sum(clf_reg.coefs_[i], axis=1)*(activ[i-1])), axis=0)
                 tmp_ind[i] = np.argmin(Sj)
                 tmp_val[i] = Sj[tmp_ind[i]]
 

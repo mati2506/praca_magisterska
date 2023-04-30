@@ -99,9 +99,9 @@ class Classifier:
                     gradient = np.outer(activation[j-1], delta)
                     self.intercepts_[j] -= self.eta*delta
                 if self.activ == "relu":
-                    deri = (activation[j]>0)*1
+                    deri = (activation[0]>0)*1
                 else:
-                    deri = activation[j]*(1 - activation[j])
+                    deri = activation[0]*(1 - activation[j])
                 delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
@@ -162,9 +162,9 @@ class Classifier:
                     gradient[zero_w[j]] = 0 #zachowanie zerowych wag z przycinania
                     self.intercepts_[j] -= self.eta*delta
                 if self.activ == "relu":
-                    deri = (activation[j]>0)*1
+                    deri = (activation[0]>0)*1
                 else:
-                    deri = activation[j]*(1 - activation[j])
+                    deri = activation[0]*(1 - activation[j])
                 delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
@@ -277,9 +277,9 @@ class Regressor:
                     gradient = np.outer(activation[j-1], delta)
                     self.intercepts_[j] -= self.eta*delta
                 if self.activ == "relu":
-                    deri = (activation[j]>0)*1
+                    deri = (activation[0]>0)*1
                 else:
-                    deri = activation[j]*(1 - activation[j])
+                    deri = activation[0]*(1 - activation[j])
                 delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
@@ -330,9 +330,9 @@ class Regressor:
                     gradient[zero_w[j]] = 0 #zachowanie zerowych wag z przycinania
                     self.intercepts_[j] -= self.eta*delta
                 if self.activ == "relu":
-                    deri = (activation[j]>0)*1
+                    deri = (activation[0]>0)*1
                 else:
-                    deri = activation[j]*(1 - activation[j])
+                    deri = activation[0]*(1 - activation[j])
                 delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
