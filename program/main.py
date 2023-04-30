@@ -100,24 +100,24 @@ network_number = 0 #numer architektury sieci, dla której będzie aktualne uruch
 
 #PRZYGOTOWANIE SIECI
 #Dla klasyfikacji
-#for hidden in networks_neurons:
-#    clf = myMLP.Classifier(hidden=hidden, epochs=500)
-#    t1 = time.time()
-#    clf.fit(X_train, y_train, X_val, y_val)
-#    t_t = str(timedelta(seconds=(time.time()-t1)))
-#    f1_train = f1_score(y_train, clf.predict(X_train), average='macro')
-#    f1_test = f1_score(y_test, clf.predict(X_test), average='macro')
-#    f1_val = f1_score(y_val, clf.predict(X_val), average='macro')
-#    l_n = str(hidden) if type(hidden) == int else '-'.join(np.array(hidden, dtype=str))
-#    f = open("nauczone_sieci.txt", 'a')
-#    f.write(f"{data[data_number]}_network_{l_n}: {t_t}  f1_train: {f1_train}  f1_test: {f1_test}  f1_validation: {f1_val} \n")
-#    f.close()
-#    pickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin", [clf])    
-#    print(t_t)
+for hidden in networks_neurons:
+    clf = myMLP.Classifier(hidden=hidden, epochs=500, activation="relu")
+    t1 = time.time()
+    clf.fit(X_train, y_train, X_val, y_val)
+    t_t = str(timedelta(seconds=(time.time()-t1)))
+    f1_train = f1_score(y_train, clf.predict(X_train), average='macro')
+    f1_test = f1_score(y_test, clf.predict(X_test), average='macro')
+    f1_val = f1_score(y_val, clf.predict(X_val), average='macro')
+    l_n = str(hidden) if type(hidden) == int else '-'.join(np.array(hidden, dtype=str))
+    f = open("nauczone_sieci.txt", 'a')
+    f.write(f"{data[data_number]}_network_{l_n}: {t_t}  f1_train: {f1_train}  f1_test: {f1_test}  f1_validation: {f1_val} \n")
+    f.close()
+    pickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin", [clf])    
+    print(t_t)
 
 #Dla regresji
 #for hidden in networks_neurons:
-#    reg = myMLP.Regressor(hidden=hidden, epochs=500)
+#    reg = myMLP.Regressor(hidden=hidden, epochs=500, activation="relu")
 #    t1 = time.time()
 #    reg.fit(X_train, y_train, X_val, y_val)
 #    t_t = str(timedelta(seconds=(time.time()-t1)))
@@ -133,8 +133,8 @@ network_number = 0 #numer architektury sieci, dla której będzie aktualne uruch
 
 
 #ODCZYT SIECI Z PLIKU .BIN
-l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_number]) == int else '-'.join(np.array(networks_neurons[network_number], dtype=str))
-[clf] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
+#l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_number]) == int else '-'.join(np.array(networks_neurons[network_number], dtype=str))
+#[clf] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
 #[reg] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
 
 #CO ZBIERAĆ Z TESTÓW:
@@ -152,22 +152,22 @@ methods = {'SP':prune.simple_pruning, 'SPA':prune.simple_pruning_amendment, 'KP'
           'PD':prune.PD_pruning, 'PEB':prune.PEB_pruning}
 
 #dla klasyfikacji
-for met in methods:
-    for los in [0, 0.025, 0.05, 0.075, 0.1]:
-        clf_t = copy.deepcopy(clf)
-        dele, f1_p, t_p = methods[met](clf_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
-        pickle_all(PRUNE_NET_FOLDER+f"{data[data_number]}_network_{l_n}_pruned_{met}_los_{los}", [clf_t])
-        print(met, dele, f1_p, t_p)
-        t_mean = 0 #średni czas predykcji
-        for _ in range(25):
-            t1 = time.time()
-            y_pred = clf_t.predict(X_test)
-            t_mean += (time.time()-t1)
-        t_mean = t_mean/25
-        f1_t = f1_score(y_test, y_pred)
-        acc = accuracy_score(y_test, y_pred)
-        cls_names = clf_t.class_labels_ #nazwy klas w zbiorze
-        conf_matrix = pd.DataFrame(confusion_matrix(y_test, y_pred, labels=cls_names), index=cls_names, columns=cls_names)
+#for met in methods:
+#    for los in [0, 0.025, 0.05, 0.075, 0.1]:
+#        clf_t = copy.deepcopy(clf)
+#        dele, f1_p, t_p = methods[met](clf_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
+#        pickle_all(PRUNE_NET_FOLDER+f"{data[data_number]}_network_{l_n}_pruned_{met}_los_{los}", [clf_t])
+#        print(met, dele, f1_p, t_p)
+#        t_mean = 0 #średni czas predykcji
+#        for _ in range(25):
+#            t1 = time.time()
+#            y_pred = clf_t.predict(X_test)
+#            t_mean += (time.time()-t1)
+#        t_mean = t_mean/25
+#        f1_t = f1_score(y_test, y_pred)
+#        acc = accuracy_score(y_test, y_pred)
+#        cls_names = clf_t.class_labels_ #nazwy klas w zbiorze
+#        conf_matrix = pd.DataFrame(confusion_matrix(y_test, y_pred, labels=cls_names), index=cls_names, columns=cls_names)
 
 #dla regresji
 #for met in methods:
@@ -188,7 +188,10 @@ for met in methods:
 
 
 
-#test działania
+
+
+
+#TEST DZIAŁANIA - DO PÓŹNIEJSZEGO USUNIĘCIA
 ##data = pd.read_csv(RAW_DATA_FOLDER+"iris.data", header=None)
 ##X = normalize(data.iloc[:,0:4].values, norm="max", axis=0)
 ##Y = data.iloc[:,4].values
@@ -198,8 +201,8 @@ for met in methods:
 ##pickle_all(DATA_FOLDER+"iris_data.bin", [X_train, X_test, X_val, y_train, y_test, y_val])
 #[X_train, X_test, X_val, y_train, y_test, y_val] = unpickle_all(DATA_FOLDER+"iris_data.bin")
 
-##clf = myMLP.Classifier(epochs=100, activation="sigmoid")
-##clf.fit(X_train, y_train, X_val, y_val)
+#clf = myMLP.Classifier(epochs=100, activation="relu", hidden=(9,5,4))
+#clf.fit(X_train, y_train, X_val, y_val)
 
 ##pickle_all(NETWORK_FOLDER+"iris.bin", [clf])
 #[clf] = unpickle_all(NETWORK_FOLDER+"iris.bin")
@@ -214,7 +217,7 @@ for met in methods:
 #ll = 0.5
 
 #print("simple_pruning:")
-#clf1 = copy.deepcopy(reg)
+#clf1 = copy.deepcopy(clf)
 #a, d1, t1 = prune.simple_pruning(clf1, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("[Przycięte wagi, neurony]: ", a)
 #print("F1 przed douczaniem", d1)
@@ -229,7 +232,7 @@ for met in methods:
 
 
 #print("simple_pruning_amendment:")
-#clf2 = copy.deepcopy(reg)
+#clf2 = copy.deepcopy(clf)
 #b, d2, t2 = prune.simple_pruning_amendment(clf2, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("[Przycięte wagi, neurony]: ", b)
 #print("F1 przed douczaniem", d2)
@@ -244,7 +247,7 @@ for met in methods:
 
 
 #print("karnin_pruning:")
-#clf3 = copy.deepcopy(reg)
+#clf3 = copy.deepcopy(clf)
 #c, d3, t3 = prune.karnin_pruning(clf3, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("[Przycięte wagi, neurony]: ", c)
 #print("F1 przed douczaniem", d3)
@@ -259,7 +262,7 @@ for met in methods:
 
 
 #print("pruning_by_variance:")
-#clf4 = copy.deepcopy(reg)
+#clf4 = copy.deepcopy(clf)
 #d, d4, t4 = prune.pruning_by_variance(clf4, ll, X_train, y_train, X_v=X_val, y_v=y_val, refit=False)
 #print("[Przycięte wagi, neurony]: ", d)
 #print("F1 przed douczaniem", d4)
@@ -274,7 +277,7 @@ for met in methods:
 
 
 #print("FBI_pruning:")
-#clf5 = copy.deepcopy(reg)
+#clf5 = copy.deepcopy(clf)
 #e, d5, t5 = prune.FBI_pruning(clf5, ll, X_train, y_train, X_v=X_val, y_v=y_val)
 #print("Przycięte neurony:", e)
 #print("F1 przed douczaniem", d5)
@@ -289,7 +292,7 @@ for met in methods:
 
 
 #print("APERT_pruning:")
-#clf6 = copy.deepcopy(reg)
+#clf6 = copy.deepcopy(clf)
 #f, d6, t6 = prune.APERT_pruning(clf6, ll, X_train, y_train, X_v=X_val, y_v=y_val)
 #print("Przycięte neurony:", f)
 #print("F1 przed douczaniem", d6)
@@ -304,7 +307,7 @@ for met in methods:
 
 
 #print("APERTP_pruning:")
-#clf7 = copy.deepcopy(reg)
+#clf7 = copy.deepcopy(clf)
 #g, d7, t7 = prune.APERTP_pruning(clf7, ll, X_train, y_train, X_v=X_val, y_v=y_val)
 #print("Przycięte neurony:", g)
 #print("F1 przed douczaniem", d7)
@@ -319,7 +322,7 @@ for met in methods:
 
 
 #print("PD_pruning:")
-#clf8 = copy.deepcopy(reg)
+#clf8 = copy.deepcopy(clf)
 #h, d8, t8 = prune.PD_pruning(clf8, ll, X_train, y_train, X_v=X_val, y_v=y_val)
 #print("Przycięte neurony:", h)
 #print("F1 przed douczaniem", d8)
@@ -334,7 +337,7 @@ for met in methods:
 
 
 #print("PEB_pruning:")
-#clf9 = copy.deepcopy(reg)
+#clf9 = copy.deepcopy(clf)
 #i, d9, t9 = prune.PEB_pruning(clf9, ll, X_train, y_train, X_v=X_val, y_v=y_val)
 #print("Przycięte neurony:", i)
 #print("F1 przed douczaniem", d9)

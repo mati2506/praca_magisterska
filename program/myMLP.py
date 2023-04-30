@@ -34,10 +34,10 @@ class Classifier:
         tmp = X.copy()
         for i in range(self.layers_count-1):
             sum_out = np.dot(tmp, self.coefs_[i]) + self.intercepts_[i]
-            if self.activ == "sigmoid":
-                tmp = self._sigmoid(sum_out)
-            else:
+            if self.activ == "relu":
                 tmp = self._relu(sum_out)
+            else:
+                tmp = self._sigmoid(sum_out)
             activation[i] = tmp.copy()
         activation[-1] = self._sigmoid(np.dot(tmp, self.coefs_[-1]) + self.intercepts_[-1]) #docelowo softmax, ale pochodna jest jakaś dziwna
         return activation
@@ -90,18 +90,18 @@ class Classifier:
                 gradient = np.outer(activation[-2], delta)
                 self.intercepts_[-1] -= self.eta*delta
                 for j in range(self.layers_count-2,0,-1):
-                    if self.activ == "sigmoid":
-                        deri = activation[j]*(1 - activation[j])
-                    else:
+                    if self.activ == "relu":
                         deri = (activation[j]>0)*1
+                    else:
+                        deri = activation[j]*(1 - activation[j])
                     delta = np.dot(delta, self.coefs_[j+1].T)*deri
                     self.coefs_[j+1] -= self.eta*gradient
                     gradient = np.outer(activation[j-1], delta)
                     self.intercepts_[j] -= self.eta*delta
-                if self.activ == "sigmoid":
-                    deri = activation[0]*(1 - activation[0])
+                if self.activ == "relu":
+                    deri = (activation[j]>0)*1
                 else:
-                    deri = (activation[0]>0)*1
+                    deri = activation[j]*(1 - activation[j])
                 delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
@@ -152,19 +152,19 @@ class Classifier:
                 gradient[zero_w[-1]] = 0 #zachowanie zerowych wag z przycinania
                 self.intercepts_[-1] -= self.eta*delta
                 for j in range(self.layers_count-2,0,-1):
-                    if self.activ == "sigmoid":
-                        deri = activation[j]*(1 - activation[j])
-                    else:
+                    if self.activ == "relu":
                         deri = (activation[j]>0)*1
+                    else:
+                        deri = activation[j]*(1 - activation[j])
                     delta = np.dot(delta, self.coefs_[j+1].T)*deri
                     self.coefs_[j+1] -= self.eta*gradient
                     gradient = np.outer(activation[j-1], delta)
                     gradient[zero_w[j]] = 0 #zachowanie zerowych wag z przycinania
                     self.intercepts_[j] -= self.eta*delta
-                if self.activ == "sigmoid":
-                    deri = activation[0]*(1 - activation[0])
+                if self.activ == "relu":
+                    deri = (activation[j]>0)*1
                 else:
-                    deri = (activation[0]>0)*1
+                    deri = activation[j]*(1 - activation[j])
                 delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
@@ -219,10 +219,10 @@ class Regressor:
         tmp = X.copy()
         for i in range(self.layers_count-1):
             sum_out = np.dot(tmp, self.coefs_[i]) + self.intercepts_[i]
-            if self.activ == "sigmoid":
-                tmp = self._sigmoid(sum_out)
-            else:
+            if self.activ == "relu":
                 tmp = self._relu(sum_out)
+            else:
+                tmp = self._sigmoid(sum_out)
             activation[i] = tmp.copy()
         activation[-1] = self._identity(np.dot(tmp, self.coefs_[-1]) + self.intercepts_[-1])
         return activation
@@ -268,18 +268,18 @@ class Regressor:
                 gradient = np.outer(activation[-2], delta)
                 self.intercepts_[-1] -= self.eta*delta
                 for j in range(self.layers_count-2,0,-1):
-                    if self.activ == "sigmoid":
-                        deri = activation[j]*(1 - activation[j])
-                    else:
+                    if self.activ == "relu":
                         deri = (activation[j]>0)*1
+                    else:
+                        deri = activation[j]*(1 - activation[j])
                     delta = np.dot(delta, self.coefs_[j+1].T)*deri
                     self.coefs_[j+1] -= self.eta*gradient
                     gradient = np.outer(activation[j-1], delta)
                     self.intercepts_[j] -= self.eta*delta
-                if self.activ == "sigmoid":
-                    deri = activation[0]*(1 - activation[0])
+                if self.activ == "relu":
+                    deri = (activation[j]>0)*1
                 else:
-                    deri = (activation[0]>0)*1
+                    deri = activation[j]*(1 - activation[j])
                 delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)
@@ -320,19 +320,19 @@ class Regressor:
                 gradient[zero_w[-1]] = 0 #zachowanie zerowych wag z przycinania
                 self.intercepts_[-1] -= self.eta*delta
                 for j in range(self.layers_count-2,0,-1):
-                    if self.activ == "sigmoid":
-                        deri = activation[j]*(1 - activation[j])
-                    else:
+                    if self.activ == "relu":
                         deri = (activation[j]>0)*1
+                    else:
+                        deri = activation[j]*(1 - activation[j])
                     delta = np.dot(delta, self.coefs_[j+1].T)*deri
                     self.coefs_[j+1] -= self.eta*gradient
                     gradient = np.outer(activation[j-1], delta)
                     gradient[zero_w[j]] = 0 #zachowanie zerowych wag z przycinania
                     self.intercepts_[j] -= self.eta*delta
-                if self.activ == "sigmoid":
-                    deri = activation[0]*(1 - activation[0])
+                if self.activ == "relu":
+                    deri = (activation[j]>0)*1
                 else:
-                    deri = (activation[0]>0)*1
+                    deri = activation[j]*(1 - activation[j])
                 delta = np.dot(delta, self.coefs_[1].T)*deri
                 self.coefs_[1] -= self.eta*gradient
                 gradient = np.outer(X[i], delta)

@@ -37,6 +37,7 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
     while del_w < num_of_coefs:      
         last_w = copy.deepcopy(clf_reg.coefs_)
         last_b = copy.deepcopy(clf_reg.intercepts_)
+        del_n_it = 0
         
         for i in range(l_c):
             if np.sum(np.isnan(tmp_w[i])) == np.size(tmp_w[i]):
@@ -59,7 +60,7 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
                         tmp_w[i] = np.delete(tmp_w[i], ind, 0)
                         tmp_w[i-1] = np.delete(tmp_w[i-1], ind, 1)
                         del_w += np.sum(clf_reg.coefs_[i-1][:,ind] != 0) #usunięte wagi z kolumny warstwy poprzedzającej (potrzebne do zakończenia głównego while)
-                        del_n += 1
+                        del_n_it += 1
                         clf_reg.coefs_[i] = np.delete(clf_reg.coefs_[i], ind, 0)
                         clf_reg.coefs_[i-1] = np.delete(clf_reg.coefs_[i-1], ind, 1)
                         clf_reg.intercepts_[i-1] = np.delete(clf_reg.intercepts_[i-1], ind, 0) #usunięcie bisu odpowiadającego usuwanemu neuronowi, może gdzieś tą wartośc by dodawać???
@@ -83,6 +84,7 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         del_w += 1
+        del_n += del_n_it
     for i in range(l_c-1): #aktualizacja liczby neuronów w warstwach ukrytych po przycinaniu
         clf_reg.hidden[i] = clf_reg.coefs_[i].shape[1]
     if if_clf:
@@ -127,6 +129,7 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
     while del_w < num_of_coefs:      
         last_w = copy.deepcopy(clf_reg.coefs_)
         last_b = copy.deepcopy(clf_reg.intercepts_)
+        del_n_it = 0
         
         for i in range(l_c):
             if np.sum(np.isnan(tmp_w[i])) == np.size(tmp_w[i]):
@@ -154,7 +157,7 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
                         tmp_w[i] = np.delete(tmp_w[i], ind, 0)
                         tmp_w[i-1] = np.delete(tmp_w[i-1], ind, 1)
                         del_w += np.sum(clf_reg.coefs_[i-1][:,ind] != 0) #usunięte wagi z kolumny warstwy poprzedzającej (potrzebne do zakończenia głównego while)
-                        del_n += 1
+                        del_n_it += 1
                         clf_reg.coefs_[i] = np.delete(clf_reg.coefs_[i], ind, 0)
                         clf_reg.coefs_[i-1] = np.delete(clf_reg.coefs_[i-1], ind, 1)
                         clf_reg.intercepts_[i-1] = np.delete(clf_reg.intercepts_[i-1], ind, 0) #usunięcie bisu odpowiadającego usuwanemu neuronowi
@@ -178,6 +181,7 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         del_w += 1
+        del_n += del_n_it
     for i in range(l_c-1): #aktualizacja liczby neuronów w warstwach ukrytych po przycinaniu
         clf_reg.hidden[i] = clf_reg.coefs_[i].shape[1]
     if if_clf:
@@ -218,6 +222,7 @@ def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
     while del_w < num_of_coefs:      
         last_w = copy.deepcopy(clf_reg.coefs_)
         last_b = copy.deepcopy(clf_reg.intercepts_)
+        del_n_it = 0
         
         for i in range(l_c):
             if np.sum(np.isnan(s[i])) == np.size(s[i]):
@@ -245,7 +250,7 @@ def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
                         s[i] = np.delete(s[i], ind, 0)
                         s[i-1] = np.delete(s[i-1], ind, 1)
                         del_w += np.sum(clf_reg.coefs_[i-1][:,ind] != 0) #usunięte wagi z kolumny warstwy poprzedzającej (potrzebne do zakończenia głównego while)
-                        del_n += 1
+                        del_n_it += 1
                         clf_reg.coefs_[i] = np.delete(clf_reg.coefs_[i], ind, 0)
                         clf_reg.coefs_[i-1] = np.delete(clf_reg.coefs_[i-1], ind, 1)
                         clf_reg.intercepts_[i-1] = np.delete(clf_reg.intercepts_[i-1], ind, 0) #usunięcie bisu odpowiadającego usuwanemu neuronowi
@@ -269,6 +274,7 @@ def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         del_w += 1
+        del_n += del_n_it
     for i in range(l_c-1): #aktualizacja liczby neuronów w warstwach ukrytych po przycinaniu
         clf_reg.hidden[i] = clf_reg.coefs_[i].shape[1]
     if if_clf:
@@ -307,6 +313,7 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
     while del_w < num_of_coefs:      
         last_w = copy.deepcopy(clf_reg.coefs_)
         last_b = copy.deepcopy(clf_reg.intercepts_)
+        del_n_it = 0
         
         for i in range(l_c):
             if np.sum(np.isnan(tmp_var[i])) == np.size(tmp_var[i]):
@@ -332,7 +339,7 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
                         tmp_mean[i] = np.delete(tmp_mean[i], ind, 0)
                         tmp_mean[i-1] = np.delete(tmp_mean[i-1], ind, 1)
                         del_w += np.sum(clf_reg.coefs_[i-1][:,ind] != 0) #usunięte wagi z kolumny warstwy poprzedzającej (potrzebne do zakończenia głównego while)
-                        del_n += 1
+                        del_n_it += 1
                         clf_reg.coefs_[i] = np.delete(clf_reg.coefs_[i], ind, 0)
                         clf_reg.coefs_[i-1] = np.delete(clf_reg.coefs_[i-1], ind, 1)
                         clf_reg.intercepts_[i-1] = np.delete(clf_reg.intercepts_[i-1], ind, 0) #usunięcie bisu odpowiadającego usuwanemu neuronowi
@@ -356,6 +363,7 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
                 clf_reg.intercepts_ = copy.deepcopy(last_b)
                 break
         del_w += 1
+        del_n += del_n_it
     for i in range(l_c-1): #aktualizacja liczby neuronów w warstwach ukrytych po przycinaniu
         clf_reg.hidden[i] = clf_reg.coefs_[i].shape[1]
     if if_clf:
