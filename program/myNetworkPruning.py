@@ -53,7 +53,7 @@ def simple_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
         clf_reg.coefs_[tmp][tmp_ind[tmp]] = 0
         
         if del_neuron:
-            for i in range(l_c-1,0,-1): #sprawdzenie, czy usunąć neuron, gdy jego wszystkie wyjścia zostały przycięte; wagi między atrybirami, a pierwsza warstwą ukrytą są pomijane
+            for i in range(1,l_c): #sprawdzenie, czy usunąć neuron, gdy jego wszystkie wyjścia zostały przycięte; wagi między atrybirami, a pierwsza warstwą ukrytą są pomijane
                 if tmp_w[i].shape[0] > 1: #czy w warstwie są przynajmniej 2 neurony
                     sums = np.nansum(tmp_w[i], axis=1)
                     for ind in (np.where(sums==0)[0])[::-1]:
@@ -148,7 +148,7 @@ def simple_pruning_amendment(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_ne
         clf_reg.coefs_[tmp][tmp_ind[tmp]] = 0
         
         if del_neuron:
-            for i in range(l_c-1,0,-1): #sprawdzenie, czy usunąć neuron, gdy jego wszystkie wyjścia zostały przycięte; wagi między atrybirami, a pierwsza warstwą ukrytą są pomijane
+            for i in range(1,l_c): #sprawdzenie, czy usunąć neuron, gdy jego wszystkie wyjścia zostały przycięte; wagi między atrybirami, a pierwsza warstwą ukrytą są pomijane
                 if tmp_w[i].shape[0] > 1: #czy w warstwie są przynajmniej 2 neurony
                     sums = np.nansum(tmp_w[i], axis=1)
                     for ind in (np.where(sums==0)[0])[::-1]:
@@ -241,7 +241,7 @@ def karnin_pruning(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=True,
         clf_reg.coefs_[tmp][tmp_ind[tmp]] = 0
         
         if del_neuron:
-            for i in range(l_c-1,0,-1): #sprawdzenie, czy usunąć neuron, gdy jego wszystkie wyjścia zostały przycięte; wagi między atrybirami, a pierwsza warstwą ukrytą są pomijane
+            for i in range(1,l_c): #sprawdzenie, czy usunąć neuron, gdy jego wszystkie wyjścia zostały przycięte; wagi między atrybirami, a pierwsza warstwą ukrytą są pomijane
                 if s[i].shape[0] > 1: #czy w warstwie są przynajmniej 2 neurony
                     sums = np.nansum(s[i], axis=1)
                     for ind in (np.where(sums==0)[0])[::-1]:
@@ -330,7 +330,7 @@ def pruning_by_variance(clf_reg, lost, X_t, y_t, X_v=None, y_v=None, del_neuron=
         clf_reg.coefs_[tmp][tmp_ind[tmp]] = 0
         
         if del_neuron:
-            for i in range(l_c-1,0,-1): #sprawdzenie, czy usunąć neuron, gdy jego wszystkie wyjścia zostały przycięte; wagi między atrybirami, a pierwsza warstwą ukrytą są pomijane
+            for i in range(1,l_c): #sprawdzenie, czy usunąć neuron, gdy jego wszystkie wyjścia zostały przycięte; wagi między atrybirami, a pierwsza warstwą ukrytą są pomijane
                 if tmp_var[i].shape[0] > 1: #czy w warstwie są przynajmniej 2 neurony
                     sums = np.nansum(tmp_var[i], axis=1)
                     for ind in (np.where(sums==0)[0])[::-1]:
