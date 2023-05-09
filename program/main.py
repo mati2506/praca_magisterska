@@ -214,7 +214,7 @@ for met in methods:
 #print("F1 validation ", f1_score(y_val, clf.predict(X_val), average='macro'))
 #print()
 
-#ll = 0.5
+#ll = 0.05
 
 #print("simple_pruning:")
 #clf1 = copy.deepcopy(clf)
