@@ -12,6 +12,9 @@ import myMLP
 import myNetworkPruning as prune
 import pickle
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 
 RAW_DATA_FOLDER = "./raw_data/"
 DATA_FOLDER = "./data/"
@@ -139,7 +142,7 @@ methods = {'SP':prune.simple_pruning, 'SPA':prune.simple_pruning_amendment, 'KP'
 
 ##dla klasyfikacji
 for network_number in range(3): #pętla po architekturach sieci
-    print("Architektura", network_number)
+    print("Architektura", networks_neurons[network_number])
     l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_number]) == int else '-'.join(np.array(networks_neurons[network_number], dtype=str))
     [clf] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin") #odczyt sieci z pliku .bin
 

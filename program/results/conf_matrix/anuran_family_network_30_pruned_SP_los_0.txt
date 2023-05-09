@@ -1,0 +1,10 @@
+\begin{tabular}{|c|cccc|}
+\toprule
+{} &  Bufonidae &  Dendrobatidae &  Hylidae &  Leptodactylidae \\
+\midrule
+Bufonidae       &         20 &              0 &        0 &                0 \\
+Dendrobatidae   &          0 &            168 &        0 &                2 \\
+Hylidae         &          1 &              0 &      605 &                9 \\
+Leptodactylidae &          0 &              0 &        7 &             1346 \\
+\bottomrule
+\end{tabular}
