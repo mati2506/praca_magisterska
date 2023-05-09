@@ -205,6 +205,7 @@ for network_number in range(3): #pętla po architekturach sieci
 
 
 
+
 #TEST DZIAŁANIA - DO PÓŹNIEJSZEGO USUNIĘCIA
 ##data = pd.read_csv(RAW_DATA_FOLDER+"iris.data", header=None)
 ##X = normalize(data.iloc[:,0:4].values, norm="max", axis=0)
@@ -228,7 +229,7 @@ for network_number in range(3): #pętla po architekturach sieci
 #print("F1 validation ", f1_score(y_val, clf.predict(X_val), average='macro'))
 #print()
 
-#ll = 0.5
+#ll = 0.05
 
 #print("simple_pruning:")
 #clf1 = copy.deepcopy(clf)
