@@ -137,13 +137,13 @@ l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_num
 [clf] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
 #[reg] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
 
-#CO ZBIERAĆ Z TESTÓW: ???
+#CO ZBIERAĆ Z TESTÓW:
 #poziom zakładanej utraty f1 (np. 0%, 2.5%, 5%, 7.5%, 10%) lub wzrostu MSE (np. 0%, 50%, 100%, 175%, 250%)
 #czas przycinania
-#wartości f1/dokładności dla klasyfikacji; MSE/R^2 dla regresji
+#wartości f1/dokładności dla klasyfikacji/macierz konfuzji; MSE/R^2 dla regresji
 #liczba usuniętych wag/neuronów
+#wartość f1/MSE przed douczniem
 #czas predykcji dla przyciętych sieci
-#W jakiej formie zbierać, aby to później jakoś w pracy wyglądło i żeby nie było to za obszerne???
   
 
 #BADANIA
