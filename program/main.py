@@ -205,7 +205,6 @@ for network_number in range(3): #pętla po architekturach sieci
 
 
 
-
 #TEST DZIAŁANIA - DO PÓŹNIEJSZEGO USUNIĘCIA
 ##data = pd.read_csv(RAW_DATA_FOLDER+"iris.data", header=None)
 ##X = normalize(data.iloc[:,0:4].values, norm="max", axis=0)
