@@ -90,7 +90,7 @@ data = ["rice", "anuran_family", "anuran_genus", "anuran_species", "dry_bean",
         "electrical_grid", "parkinson_motor", "parkinson_total", "GT_compressor", "GT_turbine"] #nazwy plików zbiorów danych
 networks_neurons = [(30), (18,15), (16,13,10)]
 
-data_number = 0 #numer danych, na których będzie aktualne uruchomienie programu
+data_number = 1 #numer danych, na których będzie aktualne uruchomienie programu
 network_number = 0 #numer architektury sieci, dla której będzie aktualne uruchomienie programu
 
 
@@ -157,25 +157,38 @@ for met in methods:
         clf_t = copy.deepcopy(clf)
         dele, f1_p, t_p = methods[met](clf_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
         pickle_all(PRUNE_NET_FOLDER+f"{data[data_number]}_network_{l_n}_pruned_{met}_los_{los}", [clf_t])
-        print(met, dele, f1_p, t_p)
+        print(met, los, dele, f1_p, t_p)
         t_mean = 0 #średni czas predykcji
         for _ in range(25):
             t1 = time.time()
             y_pred = clf_t.predict(X_test)
             t_mean += (time.time()-t1)
         t_mean = t_mean/25
-        f1_t = f1_score(y_test, y_pred)
+        f1_t = f1_score(y_test, y_pred, average='macro')
         acc = accuracy_score(y_test, y_pred)
+        #kolejność kolumn: metoda przycinania, max utrata f1, czas przycinania, f1 przed douczaniem, usunięte połączenia, usunięte neurony, dokładność po przycinaniu, f1 po przycinaniu, czas predykcji po przycinaniu
+        if met in ['SP', 'SPA', 'KP', 'PBV']:
+            row = f"{met}; {los*100}%; {t_p}; {np.round(f1_p,3)}; {dele[0]}; {dele[1]}; {np.round(acc,3)}; {np.round(f1_t,3)}; {np.round(t_mean,6)}s \n"
+        else:
+            row = f"{met}; {los*100}%; {t_p}; {np.round(f1_p,3)}; -; {dele}; {np.round(acc,3)}; {np.round(f1_t,3)}; {np.round(t_mean,6)}s \n"
+        f = open(RESULT_FOLDER+f"raw_txt/{data[data_number]}_network_{l_n}.txt", 'a')
+        f.write(row)
+        f.close()
+        #generowanie macierzy konfuzji
         cls_names = clf_t.class_labels_ #nazwy klas w zbiorze
         conf_matrix = pd.DataFrame(confusion_matrix(y_test, y_pred, labels=cls_names), index=cls_names, columns=cls_names)
+        column_format = "|c|" + "".join(["c"]*conf_matrix.shape[0]) + "|"
+        conf_matrix.to_latex(RESULT_FOLDER+f"conf_matrix/{data[data_number]}_network_{l_n}_pruned_{met}_los_{los}.txt", column_format=column_format)
 
 #dla regresji
 #for met in methods:
+#    if met == 'APERTP': #metoda działa identycznie do APERT dla regresji, więc zostaje pominięta
+#        continue
 #    for los in [0, 0.5, 1, 1.75, 2.5]:
 #        reg_t = copy.deepcopy(reg)
 #        dele, MSE_p, t_p = methods[met](reg_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
 #        pickle_all(PRUNE_NET_FOLDER+f"{data[data_number]}_network_{l_n}_pruned_{met}_los_{los}", [reg_t])
-#        print(met, dele, MSE_p, t_p)
+#        print(met, los, dele, MSE_p, t_p)
 #        t_mean = 0 #średni czas predykcji
 #        for _ in range(25):
 #            t1 = time.time()
@@ -183,9 +196,15 @@ for met in methods:
 #            t_mean += (time.time()-t1)
 #        t_mean = t_mean/25
 #        MSE_t = mean_squared_error(y_test, y_pred)
-#        MAE = mean_absolute_error(y_test, y_pred)
 #        R2 = r2_score(y_test, y_pred)
-
+#        #kolejność kolumn: metoda przycinania, max wzrost MSE, czas przycinania, MSE przed douczaniem, usunięte połączenia, usunięte neurony, MSE po przycinaniu, R2 po przycinaniu, czas predykcji po przycinaniu
+#        if met in ['SP', 'SPA', 'KP', 'PBV']:
+#            row = f"{met}; {los*100}%; {t_p}; {np.round(MSE_p,6)}; {dele[0]}; {dele[1]}; {np.round(MSE_t,6)}; {np.round(R2,3)}; {np.round(t_mean,6)}s \n"
+#        else:
+#            row = f"{met}; {los*100}%; {t_p}; {np.round(MSE_p,6)}; -; {dele}; {np.round(MSE_t,6)}; {np.round(R2,3)}; {np.round(t_mean,6)}s \n"
+#        f = open(RESULT_FOLDER+f"raw_txt/{data[data_number]}_network_{l_n}.txt", 'a')
+#        f.write(row)
+#        f.close()
 
 
 
