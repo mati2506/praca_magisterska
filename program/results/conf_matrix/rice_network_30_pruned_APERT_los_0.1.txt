@@ -1,0 +1,8 @@
+\begin{tabular}{|c|cc|}
+\toprule
+{} &     0 &     1 \\
+\midrule
+0 &  2403 &    27 \\
+1 &    35 &  2990 \\
+\bottomrule
+\end{tabular}
