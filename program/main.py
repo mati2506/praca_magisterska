@@ -93,7 +93,7 @@ data = ["rice", "anuran_family", "anuran_genus", "anuran_species", "dry_bean",
         "electrical_grid", "parkinson_motor", "parkinson_total", "GT_compressor", "GT_turbine"] #nazwy plików zbiorów danych
 networks_neurons = [(30), (18,15), (16,13,10)]
 
-data_number = 0 #numer danych, na których będzie aktualne uruchomienie programu
+data_number = 2 #numer danych, na których będzie aktualne uruchomienie programu
 network_number = 0 #numer architektury sieci, dla której będzie aktualne uruchomienie programu (tylko dla uczenia)
 
 
@@ -149,7 +149,7 @@ for network_number in range(3): #pętla po architekturach sieci
     for met in methods:
         for los in [0, 0.025, 0.05, 0.075, 0.1]:
             clf_t = copy.deepcopy(clf)
-            dele, f1_p, t_p = methods[met](clf_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=50)
+            dele, f1_p, t_p = methods[met](clf_t, los, X_train, y_train, X_v=X_val, y_v=y_val, ep=35)
             pickle_all(PRUNE_NET_FOLDER+f"{data[data_number]}_network_{l_n}_pruned_{met}_los_{los}", [clf_t])
             print(met, los, dele, f1_p, t_p)
             t_mean = 0 #średni czas predykcji

@@ -1,0 +1,14 @@
+\begin{tabular}{|c|cccccccc|}
+\toprule
+{} &  Adenomera &  Ameerega &  Dendropsophus &  Hypsiboas &  Leptodactylus &  Osteocephalus &  Rhinella &  Scinax \\
+\midrule
+Adenomera     &       1263 &         0 &              1 &          5 &              0 &              1 &         0 &       2 \\
+Ameerega      &          0 &       169 &              0 &          1 &              0 &              0 &         0 &       0 \\
+Dendropsophus &          5 &         1 &             86 &          0 &              0 &              0 &         0 &       0 \\
+Hypsiboas     &          1 &         0 &              0 &        457 &              2 &              5 &         0 &       0 \\
+Leptodactylus &          2 &         0 &              0 &          3 &             76 &              0 &         0 &       0 \\
+Osteocephalus &          0 &         0 &              0 &          2 &              1 &             17 &         0 &       0 \\
+Rhinella      &          0 &         0 &              0 &          0 &              2 &              0 &        18 &       0 \\
+Scinax        &          0 &         1 &              0 &          0 &              0 &              0 &         0 &      37 \\
+\bottomrule
+\end{tabular}
