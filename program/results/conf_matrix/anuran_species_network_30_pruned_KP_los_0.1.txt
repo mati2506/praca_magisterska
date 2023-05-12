@@ -1,0 +1,16 @@
+\begin{tabular}{|c|cccccccccc|}
+\toprule
+{} &  AdenomeraAndre &  AdenomeraHylaedactylus &  Ameeregatrivittata &  HylaMinuta &  HypsiboasCinerascens &  HypsiboasCordobae &  LeptodactylusFuscus &  OsteocephalusOophagus &  Rhinellagranulosa &  ScinaxRuber \\
+\midrule
+AdenomeraAndre         &             184 &                       0 &                   0 &           0 &                     0 &                  0 &                    0 &                      3 &                  0 &            0 \\
+AdenomeraHylaedactylus &               0 &                    1082 &                   0 &           1 &                     0 &                  1 &                    0 &                      0 &                  0 &            1 \\
+Ameeregatrivittata     &               0 &                       0 &                 168 &           1 &                     0 &                  0 &                    1 &                      0 &                  0 &            0 \\
+HylaMinuta             &               1 &                       3 &                   1 &          87 &                     0 &                  0 &                    0 &                      0 &                  0 &            0 \\
+HypsiboasCinerascens   &               0 &                       0 &                   0 &           0 &                   138 &                  0 &                    0 &                      1 &                  0 &            0 \\
+HypsiboasCordobae      &               0 &                       2 &                   0 &           0 &                     1 &                322 &                    0 &                      1 &                  0 &            0 \\
+LeptodactylusFuscus    &               0 &                       0 &                   0 &           0 &                     1 &                  1 &                   79 &                      0 &                  0 &            0 \\
+OsteocephalusOophagus  &               0 &                       0 &                   0 &           0 &                     1 &                  0 &                    0 &                     19 &                  0 &            0 \\
+Rhinellagranulosa      &               0 &                       0 &                   0 &           0 &                     1 &                  0 &                    0 &                      0 &                 18 &            1 \\
+ScinaxRuber            &               0 &                       0 &                   0 &           0 &                     0 &                  0 &                    0 &                      0 &                  1 &           37 \\
+\bottomrule
+\end{tabular}
