@@ -1,0 +1,13 @@
+\begin{tabular}{|c|ccccccc|}
+\toprule
+{} &  BARBUNYA &  BOMBAY &  CALI &  DERMASON &  HOROZ &  SEKER &  SIRA \\
+\midrule
+BARBUNYA &       354 &       0 &    26 &         0 &      1 &      5 &     7 \\
+BOMBAY   &         0 &     144 &     0 &         0 &      0 &      0 &     0 \\
+CALI     &        21 &       0 &   500 &         0 &     11 &      0 &    10 \\
+DERMASON &         0 &       0 &     0 &       986 &      0 &     22 &    42 \\
+HOROZ    &         3 &       0 &     5 &         2 &    555 &      0 &    19 \\
+SEKER    &         5 &       0 &     0 &        21 &      0 &    547 &    18 \\
+SIRA     &         3 &       0 &     1 &        97 &     15 &     15 &   648 \\
+\bottomrule
+\end{tabular}
