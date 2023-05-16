@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import myMLP
 import pickle
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 DATA_FOLDER = "./data/"
 NETWORK_FOLDER = "./networks/"
 PRUNE_NET_FOLDER = "./pruned_networks/"
@@ -40,25 +43,27 @@ for met in methods:
         arch_po_przy.append(str(siec.hidden) if type(siec.hidden) == int else '-'.join(np.array(siec.hidden, dtype=str)))
 
 arr_in = np.loadtxt(RESULT_FOLDER+f"raw_txt/{data[data_number]}_network_{l_n}.txt", dtype='<U16', delimiter="; ")
-df = pd.DataFrame({"Maksymalna utrata":arr_in[:,1], "Metoda":arr_in[:,0],
-                   "Czas przycinania":[np.round(np.sum(np.array(row.split(":")).astype(float)*sek_na),3) for row in arr_in[:,2]],
-                   "Usunięte połączenia":arr_in[:,4], "Usunięte neurony":arr_in[:,5],
-                   "Dokładność":arr_in[:,6], "F1":arr_in[:,7], "Architektura":arch_po_przy})
-df['Maksymalna utrata'] = pd.to_numeric([el[:-1] for el in df['Maksymalna utrata']])
-df['Usunięte neurony'] = pd.to_numeric(df['Usunięte neurony'])
-df['Dokładność'] = pd.to_numeric(df['Dokładność'])
+df = pd.DataFrame({"MUJ":arr_in[:,1], "Metoda":arr_in[:,0],
+                   "CP":[np.round(np.sum(np.array(row.split(":")).astype(float)*sek_na),3) for row in arr_in[:,2]],
+                   "UP":arr_in[:,4], "UN":arr_in[:,5],
+                   "Dok":arr_in[:,6], "F1":arr_in[:,7], "Arch":arch_po_przy})
+df['MUJ'] = pd.to_numeric([el[:-1] for el in df['MUJ']])
+df['UN'] = pd.to_numeric(df['UN'])
+df['Dok'] = pd.to_numeric(df['Dok'])
 df['F1'] = pd.to_numeric(df['F1'])
-df['Usunięte połączenia'] = [np.nan if el == '-' else int(el) for el in df['Usunięte połączenia']]
+df['UP'] = [np.nan if el == '-' else int(el) for el in df['UP']]
 
 #tu zrobić ploty
+#...
 
 sorterIndex = dict(zip(methods, range(len(methods))))
 df['met_sort'] = df["Metoda"].map(sorterIndex)
-df.sort_values(by=["Maksymalna utrata", "met_sort"], inplace=True)
+df.sort_values(by=["MUJ", "met_sort"], inplace=True)
 df.drop(['met_sort'], axis=1, inplace=True)
-df["Maksymalna utrata"] = [str(el)+"%" for el in df['Maksymalna utrata']]
-df['Usunięte połączenia'] = ["-" if np.isnan(el) else str(int(el)) for el in df['Usunięte połączenia']]
+df["MUJ"] = [str(el)+"%" for el in df['MUJ']]
+df['UP'] = ["-" if np.isnan(el) else str(int(el)) for el in df['UP']]
+df.set_index(["MUJ", "Metoda"], inplace=True)
 
 df.to_csv(RESULT_FOLDER+f"csv/{data[data_number]}_network_{l_n}.csv")
-df.to_latex(RESULT_FOLDER+f"tables/{data[data_number]}_network_{l_n}.txt", na_rep="-",
-            column_format="|c|c|c|c|c|c|c|c|", longtable=True, index=False)
+df.to_latex(RESULT_FOLDER+f"tables/{data[data_number]}_network_{l_n}.txt",
+             column_format="|c|c|c|c|c|c|c|c|", longtable=True)
