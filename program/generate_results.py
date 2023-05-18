@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import myMLP
 import pickle
+from sklearn.metrics import accuracy_score, f1_score, mean_squared_error, r2_score
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -29,7 +30,44 @@ networks_neurons = [(30), (18,15), (16,13,10)]
 data_number = 9
 network_number = 0
 
-#[X_train, X_test, X_val, y_train, y_test, y_val] = unpickle_all(DATA_FOLDER+f"{data[data_number]}_data.bin")
+
+# dok_f1_table = []
+# for data_number in [0,3,4]:
+#         [X_train, X_test, X_val, y_train, y_test, y_val] = unpickle_all(DATA_FOLDER+f"{data[data_number]}_data.bin")
+#         for network_number in range(3):
+#             l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_number]) == int else '-'.join(np.array(networks_neurons[network_number], dtype=str))
+#             [clf] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
+#             y_pred_train = clf.predict(X_train)
+#             y_pred_test = clf.predict(X_test)
+#             acc_train = np.round(accuracy_score(y_train, y_pred_train), 3)
+#             f1_train = np.round(f1_score(y_train, y_pred_train, average='macro'), 3)
+#             acc_test = np.round(accuracy_score(y_test, y_pred_test), 3)
+#             f1_test = np.round(f1_score(y_test, y_pred_test, average='macro'), 3)
+#             dok_f1_table.append([data[data_number], l_n, acc_train, f1_train, acc_test, f1_test])
+# df = pd.DataFrame(dok_f1_table, columns=["Zbiór", "Architektura", "dok_ucz", "f1_ucz", "dok_test", "f1_test"])
+# df.set_index(["Zbiór", "Architektura"], inplace=True)
+# df.to_csv(RESULT_FOLDER+"klasyfikacje.csv")
+# df.to_latex(RESULT_FOLDER+"klasyfikacje.txt", column_format="|c|c|c|c|c|c|")
+
+mse_r2_table = []
+for data_number in [5,8,9]:
+        [X_train, X_test, X_val, y_train, y_test, y_val] = unpickle_all(DATA_FOLDER+f"{data[data_number]}_data.bin")
+        for network_number in range(3):
+            l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_number]) == int else '-'.join(np.array(networks_neurons[network_number], dtype=str))
+            [clf] = unpickle_all(NETWORK_FOLDER+f"{data[data_number]}_network_{l_n}.bin")
+            y_pred_train = clf.predict(X_train)
+            y_pred_test = clf.predict(X_test)
+            acc_train = np.round(mean_squared_error(y_train, y_pred_train), 6)
+            f1_train = np.round(r2_score(y_train, y_pred_train), 3)
+            acc_test = np.round(mean_squared_error(y_test, y_pred_test), 6)
+            f1_test = np.round(r2_score(y_test, y_pred_test), 3)
+            mse_r2_table.append([data[data_number], l_n, acc_train, f1_train, acc_test, f1_test])
+df = pd.DataFrame(mse_r2_table, columns=["Zbiór", "Architektura", "mse_ucz", "R^{2}_ucz", "mse_test", "R^{2}_test"])
+df.set_index(["Zbiór", "Architektura"], inplace=True)
+df.to_csv(RESULT_FOLDER+"regresje.csv")
+df.to_latex(RESULT_FOLDER+"regresje.txt", column_format="|c|c|c|c|c|c|")
+
+
 
 '''
 methods = ['SP', 'SPA', 'KP', 'PBV', 'FBI', 'APERT', 'APERTP', 'PD', 'PEB']

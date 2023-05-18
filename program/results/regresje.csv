@@ -1,0 +1,10 @@
+Zbiór,Architektura,mse_ucz,R^{2}_ucz,mse_test,R^{2}_test
+electrical_grid,30,0.000182,0.866,0.000186,0.865
+electrical_grid,18-15,0.000169,0.875,0.000169,0.877
+electrical_grid,16-13-10,0.000143,0.894,0.000151,0.891
+GT_compressor,30,1e-05,0.952,1e-05,0.952
+GT_compressor,18-15,1.8e-05,0.918,1.8e-05,0.919
+GT_compressor,16-13-10,4e-05,0.813,4.1e-05,0.809
+GT_turbine,30,9e-06,0.835,9e-06,0.83
+GT_turbine,18-15,1e-05,0.821,1e-05,0.814
+GT_turbine,16-13-10,2.1e-05,0.619,2.2e-05,0.6

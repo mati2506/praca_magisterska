@@ -1,12 +1,12 @@
 \begin{longtable}{|c|c|c|c|c|c|c|c|}
 \toprule
-       &     &       CP &   UP &  UN &       MSE &  R\textasciicircum \{2\} & APP \\
+       &     &       CP &   UP &  UN &       MSE &  $R^{2}$ & APP \\
 MUJ & Metoda &          &      &     &           &        &     \\
 \midrule
 \endfirsthead
 
 \toprule
-       &     &       CP &   UP &  UN &       MSE &  R\textasciicircum \{2\} & APP \\
+       &     &       CP &   UP &  UN &       MSE &  $R^{2}$ & APP \\
 MUJ & Metoda &          &      &     &           &        &     \\
 \midrule
 \endhead
