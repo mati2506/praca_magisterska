@@ -1,13 +1,15 @@
 \begin{longtable}{|c|c|c|c|c|c|c|c|}
-\caption{Wyniki badań dla zbioru GT\_compressor dla sieci o architekturze 16-13-10}
+\caption{Przycinanie realizowane różnymi metodami dla zbioru GT\_compressor dla sieci o architekturze (16-13-10), przy analizie różnego poziomu maksymalnej utraty jakości (MUJ) przy ocenie czasu (CP), liczby usuniętych połączeń (UP), neuronów (UN), jakości regresji: MSE i $R^{2}$ oraz architektury po przycinaniu (APP).}
 \label{tab:wyniki_compressor_16-13-10} \\
 \toprule 
-MUJ & Metoda &        CP &   UP &  UN &       MSE &  $R^{2}$ &       APP \\
+MUJ & Metoda &        CP [s] &   UP &  UN &       MSE &  $R^{2}$ &       APP \\
+\midrule
 \midrule
 \endfirsthead
 
 \toprule
-MUJ & Metoda &      CP &   UP &  UN &       MSE &  $R^{2}$ &       APP \\
+MUJ & Metoda &      CP [s] &   UP &  UN &       MSE &  $R^{2}$ &       APP \\
+\midrule
 \midrule
 \endhead
 \midrule
@@ -25,6 +27,7 @@ MUJ & Metoda &      CP &   UP &  UN &       MSE &  $R^{2}$ &       APP \\
        & APERT &   93.165 &    - &   0 &  0.000012 &  0.946 &  16-13-10 \\
        & PD &   73.188 &    - &   0 &  0.000022 &  0.899 &  16-13-10 \\
        & PEB &   73.547 &    - &   0 &  0.000011 &  0.949 &  16-13-10 \\
+\midrule
 50.0\% & SP &   76.378 &    6 &   0 &  0.000011 &  0.951 &  16-13-10 \\
        & SPA &   90.780 &   34 &   0 &  0.000028 &  0.871 &  16-13-10 \\
        & KP &   86.910 &   26 &   0 &  0.000011 &  0.950 &  16-13-10 \\
@@ -33,6 +36,7 @@ MUJ & Metoda &      CP &   UP &  UN &       MSE &  $R^{2}$ &       APP \\
        & APERT &  150.807 &    - &   3 &  0.000011 &  0.949 &  14-12-10 \\
        & PD &   73.346 &    - &   1 &  0.000016 &  0.925 &  15-13-10 \\
        & PEB &   73.899 &    - &   2 &  0.000031 &  0.857 &  15-12-10 \\
+\midrule
 100.0\% & SP &   78.562 &    9 &   0 &  0.000014 &  0.937 &  16-13-10 \\
        & SPA &   90.805 &   34 &   0 &  0.000011 &  0.951 &  16-13-10 \\
        & KP &   90.058 &   33 &   0 &  0.000030 &  0.863 &  16-13-10 \\
@@ -41,6 +45,7 @@ MUJ & Metoda &      CP &   UP &  UN &       MSE &  $R^{2}$ &       APP \\
        & APERT &  151.377 &    - &   3 &  0.000011 &  0.948 &  14-12-10 \\
        & PD &   73.513 &    - &   1 &  0.000066 &  0.698 &  15-13-10 \\
        & PEB &   74.091 &    - &   2 &  0.000016 &  0.926 &  15-12-10 \\
+\midrule
 175.0\% & SP &   77.804 &    9 &   0 &  0.000013 &  0.939 &  16-13-10 \\
        & SPA &   91.702 &   36 &   0 &  0.000028 &  0.871 &  16-13-10 \\
        & KP &   91.257 &   35 &   0 &  0.000036 &  0.832 &  16-13-10 \\
@@ -49,6 +54,7 @@ MUJ & Metoda &      CP &   UP &  UN &       MSE &  $R^{2}$ &       APP \\
        & APERT &  151.163 &    - &   3 &  0.000018 &  0.916 &  14-12-10 \\
        & PD &   73.427 &    - &   1 &  0.000012 &  0.943 &  15-13-10 \\
        & PEB &   73.627 &    - &   2 &  0.000019 &  0.914 &  15-12-10 \\
+\midrule
 250.0\% & SP &   84.368 &   21 &   0 &  0.000016 &  0.924 &  16-13-10 \\
        & SPA &  111.343 &   86 &   1 &  0.000011 &  0.949 &   16-13-9 \\
        & KP &  117.268 &   86 &   0 &  0.000017 &  0.923 &  16-13-10 \\

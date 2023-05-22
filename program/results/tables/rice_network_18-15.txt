@@ -1,13 +1,15 @@
 \begin{longtable}{|c|c|c|c|c|c|c|c|}
-\caption{Wyniki badań dla zbioru rice dla sieci o architekturze 18-15}
+\caption{Przycinanie realizowane różnymi metodami dla zbioru rice dla sieci o architekturze (18-15), przy analizie różnego poziomu maksymalnej utraty jakości (MUJ) przy ocenie czasu (CP), liczby usuniętych połączeń (UP), neuronów (UN), jakości klasyfikacji: acc i F1 oraz architektury po przycinaniu (APP).}
 \label{tab:wyniki_rice_18-15} \\
 \toprule
-MUJ & Metoda &       CP &   UP &  UN &    Dok &     F1 &    APP \\
+MUJ & Metoda &       CP [s] &   UP &  UN &    acc &     F1 &    APP \\
+\midrule
 \midrule
 \endfirsthead
 
 \toprule 
-MUJ & Metoda &      CP &   UP &  UN &    Dok &     F1 &    APP \\
+MUJ & Metoda &      CP [s] &   UP &  UN &    acc &     F1 &    APP \\
+\midrule
 \midrule
 \endhead
 \midrule
@@ -26,6 +28,7 @@ MUJ & Metoda &      CP &   UP &  UN &    Dok &     F1 &    APP \\
       & APERTP &  218.675 &    - &   6 &  0.991 &  0.991 &  15-12 \\
       & PD &   55.793 &    - &   4 &  0.991 &  0.991 &  17-12 \\
       & PEB &   54.576 &    - &   2 &  0.991 &  0.991 &  18-13 \\
+\midrule
 2.5\% & SP &  275.051 &  406 &  18 &  0.991 &  0.991 &   10-5 \\
       & SPA &  303.512 &  459 &  28 &  0.990 &  0.990 &    3-2 \\
       & KP &  354.959 &  462 &  26 &  0.984 &  0.983 &    3-4 \\
@@ -35,6 +38,7 @@ MUJ & Metoda &      CP &   UP &  UN &    Dok &     F1 &    APP \\
       & APERTP &  501.186 &    - &  28 &  0.991 &  0.991 &    3-2 \\
       & PD &   73.314 &    - &  28 &  0.991 &  0.991 &    3-2 \\
       & PEB &   56.590 &    - &   5 &  0.990 &  0.990 &  17-11 \\
+\midrule
 5.0\% & SP &  299.185 &  455 &  27 &  0.989 &  0.989 &    3-3 \\
       & SPA &  303.102 &  459 &  28 &  0.989 &  0.989 &    3-2 \\
       & KP &  355.415 &  463 &  27 &  0.988 &  0.988 &    2-4 \\
@@ -44,6 +48,7 @@ MUJ & Metoda &      CP &   UP &  UN &    Dok &     F1 &    APP \\
       & APERTP &  501.966 &    - &  28 &  0.990 &  0.990 &    3-2 \\
       & PD &   72.908 &    - &  28 &  0.988 &  0.988 &    3-2 \\
       & PEB &   56.540 &    - &   5 &  0.991 &  0.991 &  17-11 \\
+\midrule
 7.5\% & SP &  299.758 &  455 &  27 &  0.990 &  0.990 &    3-3 \\
       & SPA &  302.557 &  459 &  28 &  0.989 &  0.989 &    3-2 \\
       & KP &  355.622 &  464 &  27 &  0.987 &  0.987 &    2-4 \\
@@ -53,6 +58,7 @@ MUJ & Metoda &      CP &   UP &  UN &    Dok &     F1 &    APP \\
       & APERTP &  502.062 &    - &  28 &  0.991 &  0.991 &    3-2 \\
       & PD &   73.247 &    - &  28 &  0.988 &  0.988 &    3-2 \\
       & PEB &   57.397 &    - &   6 &  0.991 &  0.991 &  17-10 \\
+\midrule
 10.0\% & SP &  298.526 &  455 &  27 &  0.989 &  0.989 &    3-3 \\
       & SPA &  303.016 &  459 &  28 &  0.991 &  0.991 &    3-2 \\
       & KP &  356.666 &  464 &  27 &  0.987 &  0.987 &    2-4 \\

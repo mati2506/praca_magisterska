@@ -1,13 +1,15 @@
 \begin{longtable}{|c|c|c|c|c|c|c|c|}
-\caption{Wyniki badań dla zbioru electrical\_grid dla sieci o architekturze 18-15}
+\caption{Przycinanie realizowane różnymi metodami dla zbioru electrical\_grid dla sieci o architekturze (18-15), przy analizie różnego poziomu maksymalnej utraty jakości (MUJ) przy ocenie czasu (CP), liczby usuniętych połączeń (UP), neuronów (UN), jakości regresji: MSE i $R^{2}$ oraz architektury po przycinaniu (APP).}
 \label{tab:wyniki_grid_18-15} \\
 \toprule  
-MUJ & Metoda &        CP &   UP &  UN &       MSE &  $R^{2}$ &    APP \\
+MUJ & Metoda &        CP [s] &   UP &  UN &       MSE &  $R^{2}$ &    APP \\
+\midrule
 \midrule
 \endfirsthead
 
 \toprule
-MUJ & Metoda &        CP &   UP &  UN &       MSE &  $R^{2}$ &    APP \\
+MUJ & Metoda &        CP [s] &   UP &  UN &       MSE &  $R^{2}$ &    APP \\
+\midrule
 \midrule
 \endhead
 \midrule
@@ -25,6 +27,7 @@ MUJ & Metoda &        CP &   UP &  UN &       MSE &  $R^{2}$ &    APP \\
        & APERT &   79.778 &    - &   2 &  0.000167 &  0.879 &  18-13 \\
        & PD &   47.122 &    - &   1 &  0.000144 &  0.895 &  18-14 \\
        & PEB &   46.858 &    - &   1 &  0.000137 &  0.901 &  18-14 \\
+\midrule
 50.0\% & SP &   64.542 &  104 &   2 &  0.000144 &  0.896 &  18-13 \\
        & SPA &   72.186 &  140 &   3 &  0.000134 &  0.903 &  18-12 \\
        & KP &   50.392 &    9 &   0 &  0.000135 &  0.902 &  18-15 \\
@@ -33,6 +36,7 @@ MUJ & Metoda &        CP &   UP &  UN &       MSE &  $R^{2}$ &    APP \\
        & APERT &  110.235 &    - &   5 &  0.000136 &  0.901 &  16-12 \\
        & PD &   47.481 &    - &   3 &  0.000159 &  0.884 &  18-12 \\
        & PEB &   47.769 &    - &   3 &  0.000148 &  0.892 &  18-12 \\
+\midrule
 100.0\% & SP &   64.935 &  106 &   3 &  0.000175 &  0.873 &  18-12 \\
        & SPA &   71.591 &  140 &   3 &  0.000139 &  0.899 &  18-12 \\
        & KP &   51.758 &   13 &   0 &  0.000169 &  0.878 &  18-15 \\
@@ -41,6 +45,7 @@ MUJ & Metoda &        CP &   UP &  UN &       MSE &  $R^{2}$ &    APP \\
        & APERT &  137.758 &    - &   8 &  0.000237 &  0.828 &  13-12 \\
        & PD &   48.310 &    - &   4 &  0.000173 &  0.875 &  18-11 \\
        & PEB &   48.212 &    - &   4 &  0.000143 &  0.896 &  18-11 \\
+\midrule
 175.0\% & SP &   68.325 &  117 &   3 &  0.000139 &  0.899 &  18-12 \\
        & SPA &   76.826 &  154 &   4 &  0.000137 &  0.900 &  18-11 \\
        & KP &   64.087 &   50 &   0 &  0.000164 &  0.881 &  18-15 \\
@@ -49,6 +54,7 @@ MUJ & Metoda &        CP &   UP &  UN &       MSE &  $R^{2}$ &    APP \\
        & APERT &  146.012 &    - &   9 &  0.000146 &  0.894 &  13-11 \\
        & PD &   48.220 &    - &   5 &  0.000143 &  0.896 &  18-10 \\
        & PEB &   48.294 &    - &   4 &  0.000133 &  0.903 &  18-11 \\
+\midrule
 250.0\% & SP &   71.496 &  140 &   3 &  0.000181 &  0.869 &  18-12 \\
        & SPA &   79.252 &  162 &   4 &  0.000136 &  0.901 &  18-11 \\
        & KP &   90.640 &  151 &   2 &  0.000267 &  0.806 &  18-13 \\

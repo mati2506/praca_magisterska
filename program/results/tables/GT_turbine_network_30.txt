@@ -1,13 +1,15 @@
 \begin{longtable}{|c|c|c|c|c|c|c|c|}
-\caption{Wyniki badań dla zbioru GT\_turbine dla sieci o architekturze 30}
+\caption{Przycinanie realizowane różnymi metodami dla zbioru GT\_turbine dla sieci o architekturze (30), przy analizie różnego poziomu maksymalnej utraty jakości (MUJ) przy ocenie czasu (CP), liczby usuniętych połączeń (UP), neuronów (UN), jakości regresji: MSE i $R^{2}$ oraz architektury po przycinaniu (APP).}
 \label{tab:wyniki_turbine_30} \\
 \toprule
-MUJ & Metoda &    CP &   UP &  UN &       MSE &  $R^{2}$ & APP \\
+MUJ & Metoda &    CP [s] &   UP &  UN &       MSE &  $R^{2}$ & APP \\
+\midrule
 \midrule
 \endfirsthead
 
 \toprule   
-MUJ & Metoda &    CP &   UP &  UN &       MSE &  $R^{2}$ & APP \\
+MUJ & Metoda &    CP [s] &   UP &  UN &       MSE &  $R^{2}$ & APP \\
+\midrule
 \midrule
 \endhead
 \midrule
@@ -25,6 +27,7 @@ MUJ & Metoda &    CP &   UP &  UN &       MSE &  $R^{2}$ & APP \\
        & APERT &  10.562 &    - &   0 &  0.000009 &  0.832 &  30 \\
        & PD &   6.328 &    - &   0 &  0.000010 &  0.826 &  30 \\
        & PEB &   6.109 &    - &   0 &  0.000009 &  0.832 &  30 \\
+\midrule
 50.0\% & SP &   8.968 &    8 &   0 &  0.000010 &  0.821 &  30 \\
        & SPA &   9.582 &   39 &   1 &  0.000010 &  0.816 &  29 \\
        & KP &   5.031 &    7 &   0 &  0.000009 &  0.835 &  30 \\
@@ -33,6 +36,7 @@ MUJ & Metoda &    CP &   UP &  UN &       MSE &  $R^{2}$ & APP \\
        & APERT &  10.562 &    - &   0 &  0.000010 &  0.819 &  30 \\
        & PD &   6.312 &    - &   0 &  0.000010 &  0.820 &  30 \\
        & PEB &   6.266 &    - &   0 &  0.000009 &  0.831 &  30 \\
+\midrule
 100.0\% & SP &   9.434 &    8 &   0 &  0.000010 &  0.829 &  30 \\
        & SPA &   9.547 &   39 &   1 &  0.000010 &  0.827 &  29 \\
        & KP &   5.094 &    7 &   0 &  0.000010 &  0.814 &  30 \\
@@ -41,6 +45,7 @@ MUJ & Metoda &    CP &   UP &  UN &       MSE &  $R^{2}$ & APP \\
        & APERT &  23.773 &    - &   1 &  0.000009 &  0.836 &  29 \\
        & PD &   8.391 &    - &   1 &  0.000009 &  0.831 &  29 \\
        & PEB &  10.769 &    - &   1 &  0.000010 &  0.827 &  29 \\
+\midrule
 175.0\% & SP &  10.594 &   10 &   0 &  0.000010 &  0.827 &  30 \\
        & SPA &  12.812 &   43 &   1 &  0.000010 &  0.822 &  29 \\
        & KP &   8.844 &    9 &   0 &  0.000010 &  0.827 &  30 \\
@@ -49,6 +54,7 @@ MUJ & Metoda &    CP &   UP &  UN &       MSE &  $R^{2}$ & APP \\
        & APERT &  23.773 &    - &   1 &  0.000009 &  0.830 &  29 \\
        & PD &   8.922 &    - &   1 &  0.000009 &  0.831 &  29 \\
        & PEB &  10.797 &    - &   1 &  0.000010 &  0.826 &  29 \\
+\midrule
 250.0\% & SP &  10.970 &   10 &   0 &  0.000009 &  0.844 &  30 \\
        & SPA &  19.531 &   72 &   2 &  0.000010 &  0.821 &  28 \\
        & KP &   8.891 &    9 &   0 &  0.000010 &  0.824 &  30 \\
