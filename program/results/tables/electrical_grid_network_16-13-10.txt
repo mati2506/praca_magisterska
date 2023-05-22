@@ -1,17 +1,17 @@
 \begin{longtable}{|c|c|c|c|c|c|c|c|}
-\toprule
-       &     &       CP &   UP &  UN &       MSE &  $R^{2}$ &       APP \\
-MUJ & Metoda &          &      &     &           &        &           \\
+\caption{Wyniki badań dla zbioru electrical\_grid dla sieci o architekturze 16-13-10}
+\label{tab:wyniki_grid_16-13-10} \\
+\toprule  
+MUJ & Metoda &      CP &   UP &  UN &       MSE &  $R^{2}$ &       APP \\
 \midrule
 \endfirsthead
 
 \toprule
-       &     &       CP &   UP &  UN &       MSE &  $R^{2}$ &       APP \\
-MUJ & Metoda &          &      &     &           &        &           \\
+MUJ & Metoda &      CP &   UP &  UN &       MSE &  $R^{2}$ &       APP \\
 \midrule
 \endhead
 \midrule
-\multicolumn{8}{r}{{Continued on next page}} \\
+\multicolumn{8}{|r|}{{Kontynuacja na następnej stronie}} \\
 \midrule
 \endfoot
 

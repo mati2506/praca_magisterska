@@ -1,17 +1,17 @@
 \begin{longtable}{|c|c|c|c|c|c|c|c|}
+\caption{Wyniki badań dla zbioru GT\_turbine dla sieci o architekturze 30}
+\label{tab:wyniki_turbine_30} \\
 \toprule
-       &     &      CP &   UP &  UN &       MSE &  $R^{2}$ & APP \\
-MUJ & Metoda &         &      &     &           &        &     \\
+MUJ & Metoda &    CP &   UP &  UN &       MSE &  $R^{2}$ & APP \\
 \midrule
 \endfirsthead
 
-\toprule
-       &     &      CP &   UP &  UN &       MSE &  $R^{2}$ & APP \\
-MUJ & Metoda &         &      &     &           &        &     \\
+\toprule   
+MUJ & Metoda &    CP &   UP &  UN &       MSE &  $R^{2}$ & APP \\
 \midrule
 \endhead
 \midrule
-\multicolumn{8}{r}{{Continued on next page}} \\
+\multicolumn{8}{|r|}{{Kontynuacja na następnej stronie}} \\
 \midrule
 \endfoot
 
