@@ -27,8 +27,8 @@ data = ["rice", "anuran_family", "anuran_genus", "anuran_species", "dry_bean",
         "electrical_grid", "parkinson_motor", "parkinson_total", "GT_compressor", "GT_turbine"] #nazwy plików zbiorów danych
 networks_neurons = [(30), (18,15), (16,13,10)]
 
-data_number = 9
-network_number = 1
+data_number = 0
+network_number = 0
 
 
 # dok_f1_table = []
@@ -76,28 +76,28 @@ l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_num
 
 arch_po_przy = []
 for met in methods:
-    if met == 'APERTP': #metoda działa identycznie do APERT dla regresji, więc zostaje pominięta
-        continue
-    for los in [0, 0.5, 1, 1.75, 2.5]:
-    #for los in [0, 0.025, 0.05, 0.075, 0.1]:
+    # if met == 'APERTP': #metoda działa identycznie do APERT dla regresji, więc zostaje pominięta
+    #     continue
+    # for los in [0, 0.5, 1, 1.75, 2.5]:
+    for los in [0, 0.025, 0.05, 0.075, 0.1]:
         [siec] =  unpickle_all(PRUNE_NET_FOLDER+f"{data[data_number]}_network_{l_n}_pruned_{met}_los_{los}")
         arch_po_przy.append(str(siec.hidden) if type(siec.hidden) == int else '-'.join(np.array(siec.hidden, dtype=str)))
 
 arr_in = np.loadtxt(RESULT_FOLDER+f"raw_txt/{data[data_number]}_network_{l_n}.txt", dtype='<U16', delimiter="; ")
-# df = pd.DataFrame({"MUJ":arr_in[:,1], "Metoda":arr_in[:,0],
-#                     "CP":[np.round(np.sum(np.array(row.split(":")).astype(float)*sek_na),3) for row in arr_in[:,2]],
-#                     "UP":arr_in[:,4], "UN":arr_in[:,5],
-#                     "Dok":arr_in[:,6], "F1":arr_in[:,7], "APP":arch_po_przy})
 df = pd.DataFrame({"MUJ":arr_in[:,1], "Metoda":arr_in[:,0],
                     "CP":[np.round(np.sum(np.array(row.split(":")).astype(float)*sek_na),3) for row in arr_in[:,2]],
                     "UP":arr_in[:,4], "UN":arr_in[:,5],
-                    "MSE":arr_in[:,6], "R^{2}":arr_in[:,7], "APP":arch_po_przy})
+                    "Dok":arr_in[:,6], "F1":arr_in[:,7], "APP":arch_po_przy})
+# df = pd.DataFrame({"MUJ":arr_in[:,1], "Metoda":arr_in[:,0],
+#                     "CP":[np.round(np.sum(np.array(row.split(":")).astype(float)*sek_na),3) for row in arr_in[:,2]],
+#                     "UP":arr_in[:,4], "UN":arr_in[:,5],
+#                     "MSE":arr_in[:,6], "R^{2}":arr_in[:,7], "APP":arch_po_przy})
 df['MUJ'] = pd.to_numeric([el[:-1] for el in df['MUJ']])
 df['UN'] = pd.to_numeric(df['UN'])
-# df['Dok'] = pd.to_numeric(df['Dok'])
-# df['F1'] = pd.to_numeric(df['F1'])
-df['MSE'] = pd.to_numeric(df['MSE'])
-df['R^{2}'] = pd.to_numeric(df['R^{2}'])
+df['Dok'] = pd.to_numeric(df['Dok'])
+df['F1'] = pd.to_numeric(df['F1'])
+# df['MSE'] = pd.to_numeric(df['MSE'])
+# df['R^{2}'] = pd.to_numeric(df['R^{2}'])
 df['UP'] = [np.nan if el == '-' else int(el) for el in df['UP']]
 
 #ploty
@@ -108,7 +108,7 @@ for i in np.unique(df['Metoda']):
 plt.legend()
 plt.xlabel("Maksymalna utrata jakości")
 plt.ylabel("Usunięte neurony")
-plt.title("Usunięte neurony w zależnśoci od utraty jakości")
+plt.title("Usunięte neurony w zależności od utraty jakości")
 plt.savefig(RESULT_FOLDER+f"plots/UN_{data[data_number]}_network_{l_n}.png")
 
 plt.figure(figsize=(16,9))
