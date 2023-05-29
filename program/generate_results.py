@@ -72,54 +72,105 @@ network_number = 0
 
 methods = ['SP', 'SPA', 'KP', 'PBV', 'FBI', 'APERT', 'APERTP', 'PD', 'PEB']
 
-l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_number]) == int else '-'.join(np.array(networks_neurons[network_number], dtype=str))
 
-arch_po_przy = []
-for met in methods:
-    # if met == 'APERTP': #metoda działa identycznie do APERT dla regresji, więc zostaje pominięta
-    #     continue
-    # for los in [0, 0.5, 1, 1.75, 2.5]:
-    for los in [0, 0.025, 0.05, 0.075, 0.1]:
-        [siec] =  unpickle_all(PRUNE_NET_FOLDER+f"{data[data_number]}_network_{l_n}_pruned_{met}_los_{los}")
-        arch_po_przy.append(str(siec.hidden) if type(siec.hidden) == int else '-'.join(np.array(siec.hidden, dtype=str)))
+for data_number in [0,3,4]:
+    for network_number in range(3):
+        print(data_number, network_number)
+        l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_number]) == int else '-'.join(np.array(networks_neurons[network_number], dtype=str))
+        
+        arch_po_przy = []
+        for met in methods:
+            for los in [0, 0.025, 0.05, 0.075, 0.1]:
+                [siec] =  unpickle_all(PRUNE_NET_FOLDER+f"{data[data_number]}_network_{l_n}_pruned_{met}_los_{los}")
+                arch_po_przy.append(str(siec.hidden) if type(siec.hidden) == int else '-'.join(np.array(siec.hidden, dtype=str)))
+        
+        arr_in = np.loadtxt(RESULT_FOLDER+f"raw_txt/{data[data_number]}_network_{l_n}.txt", dtype='<U16', delimiter="; ")
+        df = pd.DataFrame({"MUJ":arr_in[:,1], "Metoda":arr_in[:,0],
+                            "CP":[np.round(np.sum(np.array(row.split(":")).astype(float)*sek_na),3) for row in arr_in[:,2]],
+                            "UP":arr_in[:,4], "UN":arr_in[:,5],
+                            "Dok":arr_in[:,6], "F1":arr_in[:,7], "APP":arch_po_przy})
+        df['MUJ'] = pd.to_numeric([el[:-1] for el in df['MUJ']])
+        df['UN'] = pd.to_numeric(df['UN'])
+        df['Dok'] = pd.to_numeric(df['Dok'])
+        df['F1'] = pd.to_numeric(df['F1'])
+        df['UP'] = [np.nan if el == '-' else int(el) for el in df['UP']]
+        
+        #ploty
+        plt.figure(figsize=(16,9))
+        for i in np.unique(df['Metoda']):
+            wh = np.where(df['Metoda'].values == i)[0]
+            plt.plot(df['MUJ'].values[wh], df['UN'].values[wh], 'o-', label=i, linewidth=3.5, markersize=10)
+        plt.legend(fontsize="17", loc=2)
+        plt.xlabel("Maksymalna utrata jakości", fontsize="24")
+        plt.ylabel("Usunięte neurony", fontsize="24")
+        plt.title("Usunięte neurony w zależności od utraty jakości", fontsize="24")
+        plt.tick_params('both', labelsize=24)
+        plt.savefig(RESULT_FOLDER+f"plots/UN_{data[data_number]}_network_{l_n}.png")
+        
+        plt.figure(figsize=(16,9))
+        for i in np.unique(df['Metoda']):
+            wh = np.where(df['Metoda'].values == i)[0]
+            plt.plot(df['MUJ'].values[wh], df['CP'].values[wh], 'o-', label=i, linewidth=3.5, markersize=10)
+        plt.legend(fontsize="17", loc=2)
+        plt.xlabel("Maksymalna utrata jakości", fontsize="24")
+        plt.ylabel("Czas trwania przycinania [s]", fontsize="24")
+        plt.title("Czas przycinania w zależności od utraty jakości", fontsize="24")
+        plt.tick_params('both', labelsize=24)
+        plt.savefig(RESULT_FOLDER+f"plots/CP_{data[data_number]}_network_{l_n}.png")
 
-arr_in = np.loadtxt(RESULT_FOLDER+f"raw_txt/{data[data_number]}_network_{l_n}.txt", dtype='<U16', delimiter="; ")
-df = pd.DataFrame({"MUJ":arr_in[:,1], "Metoda":arr_in[:,0],
-                    "CP":[np.round(np.sum(np.array(row.split(":")).astype(float)*sek_na),3) for row in arr_in[:,2]],
-                    "UP":arr_in[:,4], "UN":arr_in[:,5],
-                    "Dok":arr_in[:,6], "F1":arr_in[:,7], "APP":arch_po_przy})
-# df = pd.DataFrame({"MUJ":arr_in[:,1], "Metoda":arr_in[:,0],
-#                     "CP":[np.round(np.sum(np.array(row.split(":")).astype(float)*sek_na),3) for row in arr_in[:,2]],
-#                     "UP":arr_in[:,4], "UN":arr_in[:,5],
-#                     "MSE":arr_in[:,6], "R^{2}":arr_in[:,7], "APP":arch_po_przy})
-df['MUJ'] = pd.to_numeric([el[:-1] for el in df['MUJ']])
-df['UN'] = pd.to_numeric(df['UN'])
-df['Dok'] = pd.to_numeric(df['Dok'])
-df['F1'] = pd.to_numeric(df['F1'])
-# df['MSE'] = pd.to_numeric(df['MSE'])
-# df['R^{2}'] = pd.to_numeric(df['R^{2}'])
-df['UP'] = [np.nan if el == '-' else int(el) for el in df['UP']]
 
-#ploty
-plt.figure(figsize=(16,9))
-for i in np.unique(df['Metoda']):
-    wh = np.where(df['Metoda'].values == i)[0]
-    plt.plot(df['MUJ'].values[wh], df['UN'].values[wh], 'o-', label=i)
-plt.legend()
-plt.xlabel("Maksymalna utrata jakości")
-plt.ylabel("Usunięte neurony")
-plt.title("Usunięte neurony w zależności od utraty jakości")
-plt.savefig(RESULT_FOLDER+f"plots/UN_{data[data_number]}_network_{l_n}.png")
+for data_number in [5,8,9]:
+    for network_number in range(3):
+        print(data_number, network_number)
+        l_n = str(networks_neurons[network_number]) if type(networks_neurons[network_number]) == int else '-'.join(np.array(networks_neurons[network_number], dtype=str))
+        
+        arch_po_przy = []
+        for met in methods:
+            if met == 'APERTP': #metoda działa identycznie do APERT dla regresji, więc zostaje pominięta
+                continue
+            for los in [0, 0.5, 1, 1.75, 2.5]:
+                [siec] =  unpickle_all(PRUNE_NET_FOLDER+f"{data[data_number]}_network_{l_n}_pruned_{met}_los_{los}")
+                arch_po_przy.append(str(siec.hidden) if type(siec.hidden) == int else '-'.join(np.array(siec.hidden, dtype=str)))
+        
+        arr_in = np.loadtxt(RESULT_FOLDER+f"raw_txt/{data[data_number]}_network_{l_n}.txt", dtype='<U16', delimiter="; ")
+        df = pd.DataFrame({"MUJ":arr_in[:,1], "Metoda":arr_in[:,0],
+                            "CP":[np.round(np.sum(np.array(row.split(":")).astype(float)*sek_na),3) for row in arr_in[:,2]],
+                            "UP":arr_in[:,4], "UN":arr_in[:,5],
+                            "MSE":arr_in[:,6], "R^{2}":arr_in[:,7], "APP":arch_po_przy})
+        df['MUJ'] = pd.to_numeric([el[:-1] for el in df['MUJ']])
+        df['UN'] = pd.to_numeric(df['UN'])
+        df['MSE'] = pd.to_numeric(df['MSE'])
+        df['R^{2}'] = pd.to_numeric(df['R^{2}'])
+        df['UP'] = [np.nan if el == '-' else int(el) for el in df['UP']]
+        
+        #ploty
+        plt.figure(figsize=(16,9))
+        for i in np.unique(df['Metoda']):
+            wh = np.where(df['Metoda'].values == i)[0]
+            plt.plot(df['MUJ'].values[wh], df['UN'].values[wh], 'o-', label=i, linewidth=3.5, markersize=10)
+        plt.legend(fontsize="17", loc=2)
+        plt.xlabel("Maksymalna utrata jakości", fontsize="24")
+        plt.ylabel("Usunięte neurony", fontsize="24")
+        plt.title("Usunięte neurony w zależności od utraty jakości", fontsize="24")
+        plt.tick_params('both', labelsize=24)
+        plt.savefig(RESULT_FOLDER+f"plots/UN_{data[data_number]}_network_{l_n}.png")
+        
+        plt.figure(figsize=(16,9))
+        for i in np.unique(df['Metoda']):
+            wh = np.where(df['Metoda'].values == i)[0]
+            plt.plot(df['MUJ'].values[wh], df['CP'].values[wh], 'o-', label=i, linewidth=3.5, markersize=10)
+        plt.legend(fontsize="17", loc=2)
+        plt.xlabel("Maksymalna utrata jakości", fontsize="24")
+        plt.ylabel("Czas trwania przycinania [s]", fontsize="24")
+        plt.title("Czas przycinania w zależności od utraty jakości", fontsize="24")
+        plt.tick_params('both', labelsize=24)
+        plt.savefig(RESULT_FOLDER+f"plots/CP_{data[data_number]}_network_{l_n}.png")
 
-plt.figure(figsize=(16,9))
-for i in np.unique(df['Metoda']):
-    wh = np.where(df['Metoda'].values == i)[0]
-    plt.plot(df['MUJ'].values[wh], df['CP'].values[wh], 'o-', label=i)
-plt.legend()
-plt.xlabel("Maksymalna utrata jakości")
-plt.ylabel("Czas trwania przycinania [s]")
-plt.title("Czas przycinania w zależności od utraty jakości")
-plt.savefig(RESULT_FOLDER+f"plots/CP_{data[data_number]}_network_{l_n}.png")
+
+
+
+
+
 
 '''
 #Generowanie tabeli latex
